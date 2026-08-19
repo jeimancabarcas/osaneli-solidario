@@ -22,7 +22,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onCheckoutSuccess,
 }) => {
   const [buyerName, setBuyerName] = useState('');
-  const [buyerCity, setBuyerCity] = useState('Cartagena');
+  const [docType, setDocType] = useState('CC');
+  const [docNumber, setDocNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [city, setCity] = useState('Cartagena');
+  const [address, setAddress] = useState('');
   const [orderNotes, setOrderNotes] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [whatsappUrl, setWhatsappUrl] = useState('');
@@ -35,7 +39,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const handleCheckout = (e: React.FormEvent) => {
     e.preventDefault();
     const finalName = buyerName.trim() || 'Comprador Solidario';
-    
+
     // Construct items bullet points
     const itemsList = items
       .map(
@@ -46,9 +50,13 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
     const messageText =
       `¡Hola OSANELI! Deseo confirmar mi pedido solidario para Cartagena 2026:\n\n` +
-      `• *Comprador:* ${finalName}\n` +
-      `• *Ciudad / Dirección:* ${buyerCity || 'Cartagena'}\n` +
-      (orderNotes ? `• *Notas:* ${orderNotes}\n\n` : '\n') +
+      `*Datos del Comprador:*\n` +
+      `• *Nombre:* ${finalName}\n` +
+      `• *Documento:* ${docType} ${docNumber.trim()}\n` +
+      `• *Teléfono:* ${phoneNumber.trim()}\n` +
+      `• *Ciudad:* ${city.trim() || 'Cartagena'}\n` +
+      `• *Dirección de Entrega:* ${address.trim()}\n` +
+      (orderNotes.trim() ? `• *Notas:* ${orderNotes.trim()}\n\n` : '\n') +
       `*Resumen del Pedido:*\n` +
       `${itemsList}\n\n` +
       `*Total a Pagar:* COP $${subtotalCOP.toLocaleString()}\n\n` +
@@ -90,7 +98,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           <button
             onClick={onClose}
             aria-label="Cerrar bolsa"
-            className="text-[#c6c6ce] hover:text-[#e9c349] transition-colors p-1"
+            className="text-[#c6c6ce] hover:text-[#e9c349] transition-colors p-1 cursor-pointer"
           >
             <X className="w-6 h-6" />
           </button>
@@ -110,10 +118,12 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               </p>
             </div>
 
-            <div className="p-4 bg-[#1a221a] border border-[#46464d] text-left text-[12px] font-mono-tag w-full space-y-1">
+            <div className="p-4 bg-[#1a221a] border border-[#46464d] text-left text-[12px] font-mono-tag w-full space-y-1.5">
               <p className="text-[#e9c349] font-bold">DETALLE DE COMPRA</p>
               <p className="text-[#c6c6ce]">Comprador: <span className="text-[#dce5d9]">{buyerName || 'Comprador Solidario'}</span></p>
-              <p className="text-[#c6c6ce]">Destino: <span className="text-[#dce5d9]">{buyerCity || 'Cartagena'}</span></p>
+              <p className="text-[#c6c6ce]">Documento: <span className="text-[#dce5d9]">{docType} {docNumber}</span></p>
+              <p className="text-[#c6c6ce]">Teléfono: <span className="text-[#dce5d9]">{phoneNumber}</span></p>
+              <p className="text-[#c6c6ce]">Entrega: <span className="text-[#dce5d9]">{address}, {city}</span></p>
               <p className="text-[#c6c6ce]">Total: <span className="text-[#e9c349] font-bold">COP ${subtotalCOP.toLocaleString()}</span></p>
               <p className="text-[#c6c6ce]">WhatsApp: <span className="text-[#25D366] font-bold">+57 323 6737646</span></p>
             </div>
@@ -169,7 +179,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       </div>
                       <button
                         onClick={() => onRemoveItem(item.piece.id, item.size)}
-                        className="text-[#c6c6ce] hover:text-red-400 p-1"
+                        className="text-[#c6c6ce] hover:text-red-400 p-1 cursor-pointer"
                         aria-label="Eliminar prenda"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -180,7 +190,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       <div className="flex items-center border border-[#46464d] bg-[#161d16]">
                         <button
                           onClick={() => onUpdateQuantity(item.piece.id, item.size, -1)}
-                          className="px-2.5 py-1 text-[13px] hover:text-[#e9c349] font-mono-tag"
+                          className="px-2.5 py-1 text-[13px] hover:text-[#e9c349] font-mono-tag cursor-pointer"
                         >
                           -
                         </button>
@@ -189,7 +199,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         </span>
                         <button
                           onClick={() => onUpdateQuantity(item.piece.id, item.size, 1)}
-                          className="px-2.5 py-1 text-[13px] hover:text-[#e9c349] font-mono-tag"
+                          className="px-2.5 py-1 text-[13px] hover:text-[#e9c349] font-mono-tag cursor-pointer"
                         >
                           +
                         </button>
@@ -224,7 +234,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 <form onSubmit={handleCheckout} className="space-y-3">
                   <div>
                     <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase block mb-1">
-                      Nombre Completo
+                      Nombre Completo *
                     </label>
                     <input
                       type="text"
@@ -232,21 +242,87 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       placeholder="Tu nombre completo"
                       value={buyerName}
                       onChange={(e) => setBuyerName(e.target.value)}
-                      className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none"
+                      className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
                     />
                   </div>
 
+                  {/* Document Type and Number */}
+                  <div className="grid grid-cols-5 gap-2">
+                    <div className="col-span-2">
+                      <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase block mb-1">
+                        Tipo Doc. *
+                      </label>
+                      <select
+                        value={docType}
+                        onChange={(e) => setDocType(e.target.value)}
+                        className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[12px] focus:border-[#e9c349] focus:outline-none"
+                      >
+                        <option value="CC">CC</option>
+                        <option value="CE">CE</option>
+                        <option value="Pasaporte">Pasaporte</option>
+                        <option value="NIT">NIT</option>
+                        <option value="TI">TI</option>
+                      </select>
+                    </div>
+
+                    <div className="col-span-3">
+                      <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase block mb-1">
+                        Nº Documento *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Ej. 1047489230"
+                        value={docNumber}
+                        onChange={(e) => setDocNumber(e.target.value)}
+                        className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Phone & City */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase block mb-1">
+                        Teléfono / WhatsApp *
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        placeholder="Ej. 300 123 4567"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase block mb-1">
+                        Ciudad *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Ej. Cartagena"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Delivery Address */}
                   <div>
                     <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase block mb-1">
-                      Ciudad / Dirección de Entrega
+                      Dirección de Entrega *
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="Ej. Cartagena, Bocagrande"
-                      value={buyerCity}
-                      onChange={(e) => setBuyerCity(e.target.value)}
-                      className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none"
+                      placeholder="Ej. Cra. 3 #8-15, Bocagrande, Apto 402"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
                     />
                   </div>
 
@@ -259,7 +335,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       placeholder="Ej. Horario de entrega o referencia"
                       value={orderNotes}
                       onChange={(e) => setOrderNotes(e.target.value)}
-                      className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none"
+                      className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
                     />
                   </div>
 

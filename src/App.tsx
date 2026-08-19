@@ -10,27 +10,20 @@ import { LightboxModal } from './components/LightboxModal';
 import { SolidarityPolicyModal } from './components/SolidarityPolicyModal';
 import { ImpactReportModal } from './components/ImpactReportModal';
 import { ContactModal } from './components/ContactModal';
-import { COLLECTION_PIECES } from './data/mockData';
+import { COLLECTION_PIECES, INITIAL_DONORS } from './data/mockData';
 import { Donor, CartItem, CollectionPiece } from './types';
 import {
   subscribeToDonors,
   subscribeToCampaign,
-  registerSolidarityDonor,
 } from './services/firebaseService';
 
 export default function App() {
-  const [donors, setDonors] = useState<Donor[]>([]);
+  const [donors, setDonors] = useState<Donor[]>(INITIAL_DONORS);
   const [currentCount, setCurrentCount] = useState<number>(142);
   const [totalCount, setTotalCount] = useState<number>(200);
 
-  // Cart state
-  const [cart, setCart] = useState<CartItem[]>([
-    {
-      piece: COLLECTION_PIECES[0],
-      size: 'L',
-      quantity: 1,
-    },
-  ]);
+  // Cart state - empty by default
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   // Modal controls
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
@@ -102,18 +95,9 @@ export default function App() {
     setCart([]);
   };
 
-  // Handle successful join / order - persisting to Firestore in real-time
-  const handleJoinSuccess = async (donorName: string, message: string, itemSupported?: string) => {
-    try {
-      await registerSolidarityDonor({
-        name: donorName,
-        message,
-        itemSupported,
-        city: 'Cartagena',
-      });
-    } catch (e) {
-      console.warn('Error recording donor in Firestore:', e);
-    }
+  // Handle order submission - purely WhatsApp redirect without automatic Firestore recording
+  const handleJoinSuccess = (_donorName: string, _message: string, _itemSupported?: string) => {
+    // The order is dispatched to WhatsApp for manual verification and subsequent registration by the owner
   };
 
   const openLightbox = (url: string, title: string) => {

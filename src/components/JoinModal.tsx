@@ -21,7 +21,11 @@ export const JoinModal: React.FC<JoinModalProps> = ({
   );
   const [size, setSize] = useState<string>('L');
   const [donorName, setDonorName] = useState<string>('');
-  const [phoneCity, setPhoneCity] = useState<string>('Cartagena');
+  const [docType, setDocType] = useState<string>('CC');
+  const [docNumber, setDocNumber] = useState<string>('');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [city, setCity] = useState<string>('Cartagena');
+  const [address, setAddress] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [whatsappUrl, setWhatsappUrl] = useState<string>('');
@@ -34,15 +38,20 @@ export const JoinModal: React.FC<JoinModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const finalName = donorName.trim() || 'Solidario Anónimo';
-    const finalMessage = message.trim() || 'Unidos por Cartagena.';
+    const finalMessage = message.trim();
     const itemSupported = `${currentPiece.name} (Talla ${size})`;
 
-    const textToSend = `¡Hola OSANELI! Deseo adquirir una pieza de la colección solidaria Cartagena 2026:\n\n` +
+    const textToSend =
+      `¡Hola OSANELI! Deseo adquirir una pieza de la colección solidaria Cartagena 2026:\n\n` +
       `• *Pieza:* ${currentPiece.name}\n` +
       `• *Talla:* ${size}\n` +
-      `• *Precio:* COP $${currentPiece.priceCOP.toLocaleString()}\n` +
-      `• *Nombre del comprador:* ${finalName}\n` +
-      `• *Ciudad/Ubicación:* ${phoneCity || 'Cartagena'}\n` +
+      `• *Precio:* COP $${currentPiece.priceCOP.toLocaleString()}\n\n` +
+      `*Datos del Comprador:*\n` +
+      `• *Nombre:* ${finalName}\n` +
+      `• *Documento:* ${docType} ${docNumber.trim()}\n` +
+      `• *Teléfono:* ${phoneNumber.trim()}\n` +
+      `• *Ciudad:* ${city.trim() || 'Cartagena'}\n` +
+      `• *Dirección de Entrega:* ${address.trim()}\n` +
       (finalMessage ? `• *Mensaje de apoyo:* "${finalMessage}"\n\n` : '\n') +
       `Deseo coordinar el pago y recibir mi pieza seriada. ¡Gracias!`;
 
@@ -96,11 +105,14 @@ export const JoinModal: React.FC<JoinModalProps> = ({
               </p>
             </div>
 
-            <div className="p-4 bg-[#1a221a] border border-[#46464d] text-left text-[13px] font-mono-tag space-y-1">
+            <div className="p-4 bg-[#1a221a] border border-[#46464d] text-left text-[13px] font-mono-tag space-y-1.5">
               <p className="text-[#e9c349] font-bold">RESUMEN DE ADQUISICIÓN</p>
               <p className="text-[#c6c6ce]">Prenda: <span className="text-[#dce5d9] font-bold">{currentPiece.name} (Talla {size})</span></p>
               <p className="text-[#c6c6ce]">Valor: <span className="text-[#e9c349] font-bold">COP ${currentPiece.priceCOP.toLocaleString()}</span></p>
               <p className="text-[#c6c6ce]">Comprador: <span className="text-[#dce5d9]">{donorName || 'Solidario Anónimo'}</span></p>
+              <p className="text-[#c6c6ce]">Documento: <span className="text-[#dce5d9]">{docType} {docNumber}</span></p>
+              <p className="text-[#c6c6ce]">Teléfono: <span className="text-[#dce5d9]">{phoneNumber}</span></p>
+              <p className="text-[#c6c6ce]">Entrega: <span className="text-[#dce5d9]">{address}, {city}</span></p>
               <p className="text-[#c6c6ce]">WhatsApp Oficial: <span className="text-[#25D366] font-bold">+57 323 6737646</span></p>
             </div>
 
@@ -137,7 +149,7 @@ export const JoinModal: React.FC<JoinModalProps> = ({
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Piece Selection */}
               <div className="space-y-2">
                 <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
@@ -196,37 +208,102 @@ export const JoinModal: React.FC<JoinModalProps> = ({
               </div>
 
               {/* Buyer Name */}
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
-                  Tu Nombre Completo
+                  Nombre Completo *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Ej. Mateo Gómez"
+                  placeholder="Ej. Mateo Gómez García"
                   value={donorName}
                   onChange={(e) => setDonorName(e.target.value)}
                   className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-3 text-[14px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
                 />
               </div>
 
-              {/* City / Location */}
-              <div className="space-y-2">
+              {/* Document Type and Document Number */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="space-y-1.5 sm:col-span-1">
+                  <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
+                    Tipo Doc. *
+                  </label>
+                  <select
+                    value={docType}
+                    onChange={(e) => setDocType(e.target.value)}
+                    className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-3 text-[14px] focus:border-[#e9c349] focus:outline-none"
+                  >
+                    <option value="CC">Cédula de Ciudadanía (CC)</option>
+                    <option value="CE">Cédula de Extranjería (CE)</option>
+                    <option value="Pasaporte">Pasaporte</option>
+                    <option value="NIT">NIT</option>
+                    <option value="TI">Tarjeta de Identidad (TI)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5 sm:col-span-2">
+                  <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
+                    Número de Documento *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ej. 1047489230"
+                    value={docNumber}
+                    onChange={(e) => setDocNumber(e.target.value)}
+                    className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-3 text-[14px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
+                  />
+                </div>
+              </div>
+
+              {/* Phone Number and City */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
+                    Número de Teléfono / WhatsApp *
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="Ej. 300 123 4567"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-3 text-[14px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
+                    Ciudad *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ej. Cartagena"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-3 text-[14px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
+                  />
+                </div>
+              </div>
+
+              {/* Delivery Address */}
+              <div className="space-y-1.5">
                 <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
-                  Ciudad o Barrio de Entrega
+                  Dirección de Entrega *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Ej. Cartagena (Bocagrande, Manga, Centro...)"
-                  value={phoneCity}
-                  onChange={(e) => setPhoneCity(e.target.value)}
+                  placeholder="Ej. Cra. 3 #8-15, Barrio Bocagrande, Edificio Caribe Apto 402"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-3 text-[14px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
                 />
               </div>
 
               {/* Message of Solidarity */}
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
                   Mensaje de Solidaridad (Opcional)
                 </label>
