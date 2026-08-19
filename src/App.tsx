@@ -17,14 +17,25 @@ import {
   subscribeToCampaign,
 } from './services/firebaseService';
 
+function checkIsAdminRoute(): boolean {
+  if (typeof window === 'undefined') return false;
+  const path = window.location.pathname.toLowerCase();
+  const hash = window.location.hash.toLowerCase();
+  const search = new URLSearchParams(window.location.search);
+
+  return (
+    path.startsWith('/admin') ||
+    hash === '#admin' ||
+    hash === '#/admin' ||
+    hash.includes('admin') ||
+    search.get('admin') === 'true' ||
+    search.get('page') === 'admin'
+  );
+}
+
 export default function App() {
   // Navigation / Route state
-  const [isAdminRoute, setIsAdminRoute] = useState<boolean>(() => {
-    return (
-      typeof window !== 'undefined' &&
-      (window.location.pathname.startsWith('/admin') || window.location.hash === '#admin')
-    );
-  });
+  const [isAdminRoute, setIsAdminRoute] = useState<boolean>(() => checkIsAdminRoute());
 
   const [donors, setDonors] = useState<Donor[]>([]);
   const [currentCount, setCurrentCount] = useState<number | null>(null);
@@ -54,9 +65,7 @@ export default function App() {
   // Listen to URL changes for /admin
   useEffect(() => {
     const checkRoute = () => {
-      const isCurrentAdmin =
-        window.location.pathname.startsWith('/admin') || window.location.hash === '#admin';
-      setIsAdminRoute(isCurrentAdmin);
+      setIsAdminRoute(checkIsAdminRoute());
     };
 
     window.addEventListener('popstate', checkRoute);
