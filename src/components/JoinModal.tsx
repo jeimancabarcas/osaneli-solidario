@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Heart, ShieldCheck, CheckCircle2, MessageCircle, ArrowRight } from 'lucide-react';
 import { COLLECTION_PIECES } from '../data/mockData';
 import { CollectionPiece } from '../types';
+import { createOrder } from '../services/firebaseService';
 
 interface JoinModalProps {
   isOpen: boolean;
@@ -57,6 +58,30 @@ export const JoinModal: React.FC<JoinModalProps> = ({
 
     const generatedUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(textToSend)}`;
     setWhatsappUrl(generatedUrl);
+
+    // Save order automatically into database in pending status
+    createOrder({
+      name: finalName,
+      docType,
+      docNumber: docNumber.trim(),
+      phoneNumber: phoneNumber.trim(),
+      city: city.trim() || 'Cartagena',
+      address: address.trim(),
+      message: finalMessage,
+      itemSupported,
+      items: [
+        {
+          pieceId: currentPiece.id,
+          name: currentPiece.name,
+          size,
+          quantity: 1,
+          priceCOP: currentPiece.priceCOP,
+        },
+      ],
+      totalAmount: currentPiece.priceCOP,
+    }).catch((err) => {
+      console.warn('Error recording order in Firestore:', err);
+    });
 
     onJoinSuccess(finalName, finalMessage, itemSupported);
     setIsSuccess(true);

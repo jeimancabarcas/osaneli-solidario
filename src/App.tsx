@@ -10,6 +10,7 @@ import { LightboxModal } from './components/LightboxModal';
 import { SolidarityPolicyModal } from './components/SolidarityPolicyModal';
 import { ImpactReportModal } from './components/ImpactReportModal';
 import { ContactModal } from './components/ContactModal';
+import { AdminPanel } from './components/AdminPanel';
 import { Donor, CartItem, CollectionPiece } from './types';
 import {
   subscribeToDonors,
@@ -17,6 +18,14 @@ import {
 } from './services/firebaseService';
 
 export default function App() {
+  // Navigation / Route state
+  const [isAdminRoute, setIsAdminRoute] = useState<boolean>(() => {
+    return (
+      typeof window !== 'undefined' &&
+      (window.location.pathname.startsWith('/admin') || window.location.hash === '#admin')
+    );
+  });
+
   const [donors, setDonors] = useState<Donor[]>([]);
   const [currentCount, setCurrentCount] = useState<number | null>(null);
   const [totalCount, setTotalCount] = useState<number>(200);
@@ -42,7 +51,43 @@ export default function App() {
     title: '',
   });
 
-  // Real-time Firestore Subscriptions
+  // Listen to URL changes for /admin
+  useEffect(() => {
+    const checkRoute = () => {
+      const isCurrentAdmin =
+        window.location.pathname.startsWith('/admin') || window.location.hash === '#admin';
+      setIsAdminRoute(isCurrentAdmin);
+    };
+
+    window.addEventListener('popstate', checkRoute);
+    window.addEventListener('hashchange', checkRoute);
+    return () => {
+      window.removeEventListener('popstate', checkRoute);
+      window.removeEventListener('hashchange', checkRoute);
+    };
+  }, []);
+
+  const navigateToAdmin = () => {
+    try {
+      window.history.pushState({}, '', '/admin');
+    } catch {
+      window.location.hash = 'admin';
+    }
+    setIsAdminRoute(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const navigateToStore = () => {
+    try {
+      window.history.pushState({}, '', '/');
+    } catch {
+      window.location.hash = '';
+    }
+    setIsAdminRoute(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Real-time Firestore Subscriptions for Public Store
   useEffect(() => {
     const unsubDonors = subscribeToDonors((realtimeDonors) => {
       setDonors(realtimeDonors);
@@ -98,9 +143,8 @@ export default function App() {
     setCart([]);
   };
 
-  // Handle order submission - purely WhatsApp redirect without automatic Firestore recording
   const handleJoinSuccess = (_donorName: string, _message: string, _itemSupported?: string) => {
-    // The order is dispatched to WhatsApp for manual verification and subsequent registration by the owner
+    // Registered in Firestore in pending status and dispatched to WhatsApp
   };
 
   const openLightbox = (url: string, title: string) => {
@@ -116,6 +160,11 @@ export default function App() {
   };
 
   const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  // If user is accessing /admin, show full Admin Panel
+  if (isAdminRoute) {
+    return <AdminPanel onBackToStore={navigateToStore} />;
+  }
 
   return (
     <div className="min-h-screen bg-[#0d150f] text-[#dce5d9] flex flex-col selection:bg-[#e9c349] selection:text-[#241a00]">
@@ -158,6 +207,7 @@ export default function App() {
         onOpenPolicy={() => setIsPolicyOpen(true)}
         onOpenReport={() => setIsReportOpen(true)}
         onOpenContact={() => setIsContactOpen(true)}
+        onOpenAdmin={navigateToAdmin}
       />
 
       {/* Modals and Drawers */}

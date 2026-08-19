@@ -10,9 +10,10 @@ import {
   limit,
   increment,
   updateDoc,
+  deleteDoc,
 } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { Donor } from '../types';
+import { Donor, Order, OrderStatus } from '../types';
 
 export function formatTimeAgo(timestamp: number): string {
   const now = Date.now();
@@ -28,18 +29,139 @@ export function formatTimeAgo(timestamp: number): string {
   return `Hace ${diffDays} d`;
 }
 
-// Initial seed donors in case Firestore is completely empty on first launch
-const INITIAL_SEED_DONORS = [
-  { name: 'Valentina M.', message: 'Orgullosa de mi tierra, fuerza Cartagena.', itemSupported: 'Camiseta Solidaria OSANELI (Talla M)', city: 'Cartagena', minutesAgo: 3 },
-  { name: 'Carlos Andrés R.', message: 'Presente desde Bocagrande con el corazón.', itemSupported: 'Short Denim Solidario OSANELI (Talla L)', city: 'Cartagena', minutesAgo: 14 },
-  { name: 'Mariana S.', message: 'Toda mi solidaridad con nuestra gente.', itemSupported: 'Camiseta Solidaria OSANELI (Talla S)', city: 'Cartagena', minutesAgo: 28 },
-  { name: 'Felipe & Familia', message: 'Cada grano cuenta. Fuerza.', itemSupported: 'Camiseta Solidaria OSANELI (Talla XL)', city: 'Cartagena', minutesAgo: 45 },
-  { name: 'Daniela K.', message: 'Unidos somos más fuertes.', itemSupported: 'Short Denim Solidario OSANELI (Talla M)', city: 'Cartagena', minutesAgo: 90 },
-];
+/**
+ * Creates an order in Firestore with pending status
+ */
+export async function createOrder(payload: Omit<Order, 'id' | 'timestamp' | 'status' | 'timeAgo'>): Promise<string> {
+  const ordersRef = collection(db, 'orders');
+  const now = Date.now();
+
+  const docRef = await addDoc(ordersRef, {
+    ...payload,
+    status: 'pending',
+    timestamp: now,
+  });
+
+  return docRef.id;
+}
 
 /**
- * Subscribes to real-time donors from Firestore.
- * If the collection is empty, seeds the initial donors.
+ * Subscribes to all orders in real-time (for Admin panel)
+ */
+export function subscribeToOrders(onUpdate: (orders: Order[]) => void): () => void {
+  const ordersRef = collection(db, 'orders');
+  const q = query(ordersRef, orderBy('timestamp', 'desc'));
+
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      const orders: Order[] = snapshot.docs.map((docSnap) => {
+        const data = docSnap.data();
+        const timestamp = typeof data.timestamp === 'number' ? data.timestamp : Date.now();
+        return {
+          id: docSnap.id,
+          name: data.name || 'Comprador',
+          docType: data.docType || 'CC',
+          docNumber: data.docNumber || '',
+          phoneNumber: data.phoneNumber || '',
+          city: data.city || 'Cartagena',
+          address: data.address || '',
+          message: data.message || '',
+          itemSupported: data.itemSupported || '',
+          items: data.items || [],
+          totalAmount: typeof data.totalAmount === 'number' ? data.totalAmount : 0,
+          status: (data.status as OrderStatus) || 'pending',
+          timestamp,
+          timeAgo: formatTimeAgo(timestamp),
+          confirmedAt: data.confirmedAt,
+        };
+      });
+      onUpdate(orders);
+    },
+    (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'orders');
+    }
+  );
+
+  return unsubscribe;
+}
+
+/**
+ * Updates order status (pending, confirmed, rejected)
+ * When confirmed, also registers in donors collection and increments campaign counter.
+ */
+export async function updateOrderStatus(order: Order, newStatus: OrderStatus): Promise<void> {
+  const orderRef = doc(db, 'orders', order.id);
+  const previousStatus = order.status;
+
+  await updateDoc(orderRef, {
+    status: newStatus,
+    confirmedAt: newStatus === 'confirmed' ? Date.now() : null,
+  });
+
+  const campaignDocRef = doc(db, 'campaign', 'cartagena2026');
+  const donorDocRef = doc(db, 'donors', order.id);
+
+  // If newly confirmed, add to donors and increment campaign count
+  if (newStatus === 'confirmed' && previousStatus !== 'confirmed') {
+    try {
+      await setDoc(donorDocRef, {
+        name: order.name,
+        message: order.message || '',
+        itemSupported: order.itemSupported || '',
+        city: order.city || 'Cartagena',
+        timestamp: Date.now(),
+        status: 'confirmed',
+      });
+
+      await updateDoc(campaignDocRef, {
+        currentCount: increment(1),
+        updatedAt: Date.now(),
+      });
+    } catch (e) {
+      console.warn('Error syncing confirmed donor:', e);
+    }
+  }
+
+  // If unconfirmed from previously confirmed, remove donor and decrement
+  if (previousStatus === 'confirmed' && newStatus !== 'confirmed') {
+    try {
+      await deleteDoc(donorDocRef);
+      await updateDoc(campaignDocRef, {
+        currentCount: increment(-1),
+        updatedAt: Date.now(),
+      });
+    } catch (e) {
+      console.warn('Error reverting confirmed donor:', e);
+    }
+  }
+}
+
+/**
+ * Deletes an order
+ */
+export async function deleteOrder(orderId: string, wasConfirmed: boolean): Promise<void> {
+  const orderRef = doc(db, 'orders', orderId);
+  await deleteDoc(orderRef);
+
+  if (wasConfirmed) {
+    try {
+      const donorDocRef = doc(db, 'donors', orderId);
+      await deleteDoc(donorDocRef);
+
+      const campaignDocRef = doc(db, 'campaign', 'cartagena2026');
+      await updateDoc(campaignDocRef, {
+        currentCount: increment(-1),
+        updatedAt: Date.now(),
+      });
+    } catch (e) {
+      console.warn('Error cleaning up deleted donor:', e);
+    }
+  }
+}
+
+/**
+ * Subscribes to real-time confirmed donors from Firestore for public feed.
  */
 export function subscribeToDonors(onUpdate: (donors: Donor[]) => void): () => void {
   const donorsRef = collection(db, 'donors');
@@ -47,26 +169,7 @@ export function subscribeToDonors(onUpdate: (donors: Donor[]) => void): () => vo
 
   const unsubscribe = onSnapshot(
     q,
-    async (snapshot) => {
-      if (snapshot.empty) {
-        // Seed initial donors to Firestore
-        try {
-          const now = Date.now();
-          for (const item of INITIAL_SEED_DONORS) {
-            await addDoc(donorsRef, {
-              name: item.name,
-              message: item.message,
-              itemSupported: item.itemSupported,
-              city: item.city,
-              timestamp: now - item.minutesAgo * 60 * 1000,
-            });
-          }
-        } catch (e) {
-          console.warn('Could not auto-seed donors:', e);
-        }
-        return;
-      }
-
+    (snapshot) => {
       const donors: Donor[] = snapshot.docs.map((docSnap) => {
         const data = docSnap.data();
         const timestamp = typeof data.timestamp === 'number' ? data.timestamp : Date.now();
@@ -76,6 +179,7 @@ export function subscribeToDonors(onUpdate: (donors: Donor[]) => void): () => vo
           message: data.message || '',
           itemSupported: data.itemSupported || '',
           city: data.city || '',
+          status: data.status || 'confirmed',
           timestamp,
           timeAgo: formatTimeAgo(timestamp),
         };
@@ -105,20 +209,20 @@ export function subscribeToCampaign(
       if (!docSnap.exists()) {
         try {
           await setDoc(campaignDocRef, {
-            currentCount: 142,
+            currentCount: 0,
             totalCount: 200,
             updatedAt: Date.now(),
           });
         } catch (e) {
           console.warn('Could not initialize campaign doc:', e);
         }
-        onUpdate({ currentCount: 142, totalCount: 200 });
+        onUpdate({ currentCount: 0, totalCount: 200 });
         return;
       }
 
       const data = docSnap.data();
       onUpdate({
-        currentCount: typeof data.currentCount === 'number' ? data.currentCount : 142,
+        currentCount: typeof data.currentCount === 'number' ? data.currentCount : 0,
         totalCount: typeof data.totalCount === 'number' ? data.totalCount : 200,
       });
     },
@@ -131,47 +235,42 @@ export function subscribeToCampaign(
 }
 
 /**
- * Saves a new donor/buyer action into Firestore and increments the real-time counter.
+ * Updates campaign counter manually from admin
  */
-export async function registerSolidarityDonor(payload: {
-  name: string;
-  message?: string;
-  itemSupported?: string;
-  city?: string;
-}) {
-  const donorsRef = collection(db, 'donors');
+export async function updateCampaignStats(currentCount: number, totalCount: number): Promise<void> {
   const campaignDocRef = doc(db, 'campaign', 'cartagena2026');
+  await setDoc(
+    campaignDocRef,
+    {
+      currentCount,
+      totalCount,
+      updatedAt: Date.now(),
+    },
+    { merge: true }
+  );
+}
 
-  try {
-    // 1. Add Donor doc
-    await addDoc(donorsRef, {
-      name: payload.name.trim() || 'Solidario Anónimo',
-      message: payload.message?.trim() || '',
-      itemSupported: payload.itemSupported?.trim() || '',
-      city: payload.city?.trim() || 'Cartagena',
-      timestamp: Date.now(),
+/**
+ * Verifies admin credentials in Firestore (email: admin@osaneli.com, pass: 0s4n3l1)
+ */
+export async function verifyAdminAuth(emailInput: string, passwordInput: string): Promise<boolean> {
+  const adminDocRef = doc(db, 'admins', 'primary_admin');
+  const snap = await getDoc(adminDocRef);
+
+  if (!snap.exists()) {
+    // Initialize default admin document
+    await setDoc(adminDocRef, {
+      email: 'admin@osaneli.com',
+      password: '0s4n3l1',
+      role: 'superadmin',
+      createdAt: Date.now(),
     });
-
-    // 2. Increment live campaign counter
-    try {
-      const campSnap = await getDoc(campaignDocRef);
-      if (campSnap.exists()) {
-        await updateDoc(campaignDocRef, {
-          currentCount: increment(1),
-          updatedAt: Date.now(),
-        });
-      } else {
-        await setDoc(campaignDocRef, {
-          currentCount: 143,
-          totalCount: 200,
-          updatedAt: Date.now(),
-        });
-      }
-    } catch (countErr) {
-      console.warn('Could not increment campaign count:', countErr);
-    }
-  } catch (error) {
-    handleFirestoreError(error, OperationType.CREATE, 'donors');
-    throw error;
+    return emailInput.trim().toLowerCase() === 'admin@osaneli.com' && passwordInput === '0s4n3l1';
   }
+
+  const data = snap.data();
+  return (
+    emailInput.trim().toLowerCase() === (data.email || 'admin@osaneli.com').toLowerCase() &&
+    passwordInput === (data.password || '0s4n3l1')
+  );
 }

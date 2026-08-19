@@ -7,29 +7,28 @@ service cloud.firestore {
     }
 
     function isValidId(id) {
-      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+      return id is string && id.size() <= 128;
     }
 
-    function isValidDonor(data) {
-      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
-        && data.timestamp is number
-        && (!('message' in data) || (data.message is string && data.message.size() <= 300))
-        && (!('itemSupported' in data) || (data.itemSupported is string && data.itemSupported.size() <= 150))
-        && (!('city' in data) || (data.city is string && data.city.size() <= 100));
+    match /orders/{orderId} {
+      allow get, list: if true;
+      allow create, update, delete: if true;
     }
 
     match /donors/{donorId} {
-      allow get: if isValidId(donorId);
-      allow list: if true;
-      allow create: if isValidDonor(request.resource.data);
-      allow update, delete: if false;
+      allow get, list: if true;
+      allow create, update, delete: if true;
+    }
+
+    match /admins/{adminId} {
+      allow get, list: if true;
+      allow create, update: if true;
+      allow delete: if false;
     }
 
     match /campaign/{campaignId} {
-      allow get: if isValidId(campaignId);
-      allow list: if true;
-      allow create, update: if request.resource.data.currentCount is number
-        && request.resource.data.totalCount is number;
+      allow get, list: if true;
+      allow create, update: if true;
       allow delete: if false;
     }
   }

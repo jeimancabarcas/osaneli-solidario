@@ -1,15 +1,18 @@
 import React from 'react';
+import { Lock } from 'lucide-react';
 
 interface FooterProps {
   onOpenPolicy: () => void;
   onOpenReport: () => void;
   onOpenContact: () => void;
+  onOpenAdmin?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   onOpenPolicy,
   onOpenReport,
   onOpenContact,
+  onOpenAdmin,
 }) => {
   return (
     <footer
@@ -24,7 +27,7 @@ export const Footer: React.FC<FooterProps> = ({
         © 2026 OSANELI - TODOS SOMOS COLOMBIA · CARTAGENA
       </div>
 
-      <div className="flex flex-wrap justify-center gap-6 font-mono-tag text-[12px] text-[#c6c6ce]">
+      <div className="flex flex-wrap items-center justify-center gap-6 font-mono-tag text-[12px] text-[#c6c6ce]">
         <button
           onClick={onOpenPolicy}
           className="hover:text-[#e9c349] underline underline-offset-4 transition-all opacity-80 hover:opacity-100 cursor-pointer"
@@ -43,6 +46,16 @@ export const Footer: React.FC<FooterProps> = ({
         >
           Contact
         </button>
+        {onOpenAdmin && (
+          <button
+            onClick={onOpenAdmin}
+            className="hover:text-[#e9c349] flex items-center gap-1 transition-all opacity-70 hover:opacity-100 cursor-pointer text-[#e9c349]/90"
+            title="Acceso al panel administrativo"
+          >
+            <Lock className="w-3 h-3" />
+            <span>Admin</span>
+          </button>
+        )}
       </div>
     </footer>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Trash2, ShoppingBag, MessageCircle, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { CartItem } from '../types';
+import { createOrder } from '../services/firebaseService';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -64,6 +65,28 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
     const generatedUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(messageText)}`;
     setWhatsappUrl(generatedUrl);
+
+    // Save order in Firestore in pending status
+    createOrder({
+      name: finalName,
+      docType,
+      docNumber: docNumber.trim(),
+      phoneNumber: phoneNumber.trim(),
+      city: city.trim() || 'Cartagena',
+      address: address.trim(),
+      message: orderNotes.trim(),
+      itemSupported: items.map((i) => `${i.piece.name} (${i.size}) x${i.quantity}`).join(', '),
+      items: items.map((i) => ({
+        pieceId: i.piece.id,
+        name: i.piece.name,
+        size: i.size,
+        quantity: i.quantity,
+        priceCOP: i.piece.priceCOP,
+      })),
+      totalAmount: subtotalCOP,
+    }).catch((err) => {
+      console.warn('Error recording cart order in Firestore:', err);
+    });
 
     onCheckoutSuccess(finalName, `Adquirió ${items.length} piezas solidarias para Cartagena.`);
     setIsSuccess(true);

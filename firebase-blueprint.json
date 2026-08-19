@@ -1,17 +1,48 @@
 {
   "entities": {
+    "Order": {
+      "title": "Order",
+      "description": "Solidarity piece order registered before and after WhatsApp confirmation",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 150 },
+        "docType": { "type": "string", "maxLength": 20 },
+        "docNumber": { "type": "string", "maxLength": 50 },
+        "phoneNumber": { "type": "string", "maxLength": 50 },
+        "city": { "type": "string", "maxLength": 100 },
+        "address": { "type": "string", "maxLength": 250 },
+        "message": { "type": "string", "maxLength": 300 },
+        "itemSupported": { "type": "string", "maxLength": 200 },
+        "totalAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "rejected"] },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["name", "status", "timestamp"]
+    },
     "Donor": {
       "title": "Donor",
-      "description": "A supporter or buyer who acquired a solidarity piece for Cartagena 2026.",
+      "description": "A supporter or buyer with confirmed order displayed on the public ticker",
       "type": "object",
       "properties": {
         "name": { "type": "string", "maxLength": 100 },
         "message": { "type": "string", "maxLength": 300 },
         "itemSupported": { "type": "string", "maxLength": 150 },
         "city": { "type": "string", "maxLength": 100 },
-        "timestamp": { "type": "number" }
+        "timestamp": { "type": "number" },
+        "status": { "type": "string" }
       },
       "required": ["name", "timestamp"]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Administrator account credentials for order management",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "password": { "type": "string" },
+        "role": { "type": "string" }
+      },
+      "required": ["email", "password"]
     },
     "Campaign": {
       "title": "Campaign",
@@ -26,9 +57,17 @@
     }
   },
   "firestore": {
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Collection of customer orders"
+    },
     "/donors/{donorId}": {
       "schema": "Donor",
       "description": "Collection of donors and buyers participating in the initiative"
+    },
+    "/admins/{adminId}": {
+      "schema": "AdminUser",
+      "description": "Collection of administrative accounts"
     },
     "/campaign/{campaignId}": {
       "schema": "Campaign",
