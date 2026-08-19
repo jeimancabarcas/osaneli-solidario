@@ -10,13 +10,18 @@ import { LightboxModal } from './components/LightboxModal';
 import { SolidarityPolicyModal } from './components/SolidarityPolicyModal';
 import { ImpactReportModal } from './components/ImpactReportModal';
 import { ContactModal } from './components/ContactModal';
-import { INITIAL_DONORS, COLLECTION_PIECES } from './data/mockData';
+import { COLLECTION_PIECES } from './data/mockData';
 import { Donor, CartItem, CollectionPiece } from './types';
+import {
+  subscribeToDonors,
+  subscribeToCampaign,
+  registerSolidarityDonor,
+} from './services/firebaseService';
 
 export default function App() {
-  const [donors, setDonors] = useState<Donor[]>(INITIAL_DONORS);
+  const [donors, setDonors] = useState<Donor[]>([]);
   const [currentCount, setCurrentCount] = useState<number>(142);
-  const totalCount = 200;
+  const [totalCount, setTotalCount] = useState<number>(200);
 
   // Cart state
   const [cart, setCart] = useState<CartItem[]>([
@@ -42,6 +47,23 @@ export default function App() {
     url: '',
     title: '',
   });
+
+  // Real-time Firestore Subscriptions
+  useEffect(() => {
+    const unsubDonors = subscribeToDonors((realtimeDonors) => {
+      setDonors(realtimeDonors);
+    });
+
+    const unsubCampaign = subscribeToCampaign((stats) => {
+      setCurrentCount(stats.currentCount);
+      setTotalCount(stats.totalCount);
+    });
+
+    return () => {
+      unsubDonors();
+      unsubCampaign();
+    };
+  }, []);
 
   // Handle adding to cart
   const handleAddToCart = (piece: CollectionPiece, size: string) => {
@@ -80,19 +102,18 @@ export default function App() {
     setCart([]);
   };
 
-  // Handle successful join / pledge
-  const handleJoinSuccess = (donorName: string, message: string, itemSupported?: string) => {
-    const newDonor: Donor = {
-      id: `d-${Date.now()}`,
-      name: donorName,
-      timeAgo: 'Hace unos segundos',
-      timestamp: Date.now(),
-      message,
-      itemSupported,
-    };
-
-    setDonors((prev) => [newDonor, ...prev]);
-    setCurrentCount((prev) => Math.min(totalCount, prev + 1));
+  // Handle successful join / order - persisting to Firestore in real-time
+  const handleJoinSuccess = async (donorName: string, message: string, itemSupported?: string) => {
+    try {
+      await registerSolidarityDonor({
+        name: donorName,
+        message,
+        itemSupported,
+        city: 'Cartagena',
+      });
+    } catch (e) {
+      console.warn('Error recording donor in Firestore:', e);
+    }
   };
 
   const openLightbox = (url: string, title: string) => {

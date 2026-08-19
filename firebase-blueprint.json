@@ -1,0 +1,38 @@
+{
+  "entities": {
+    "Donor": {
+      "title": "Donor",
+      "description": "A supporter or buyer who acquired a solidarity piece for Cartagena 2026.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "message": { "type": "string", "maxLength": 300 },
+        "itemSupported": { "type": "string", "maxLength": 150 },
+        "city": { "type": "string", "maxLength": 100 },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["name", "timestamp"]
+    },
+    "Campaign": {
+      "title": "Campaign",
+      "description": "Live status and count of pieces acquired for Cartagena 2026.",
+      "type": "object",
+      "properties": {
+        "currentCount": { "type": "number" },
+        "totalCount": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["currentCount", "totalCount"]
+    }
+  },
+  "firestore": {
+    "/donors/{donorId}": {
+      "schema": "Donor",
+      "description": "Collection of donors and buyers participating in the initiative"
+    },
+    "/campaign/{campaignId}": {
+      "schema": "Campaign",
+      "description": "Global counter for total campaign pieces"
+    }
+  }
+}
