@@ -30,7 +30,7 @@ export function formatTimeAgo(timestamp: number): string {
 }
 
 /**
- * Creates an order in Firestore with pending status
+ * Creates an order in Firestore with pending status (from public checkout)
  */
 export async function createOrder(payload: Omit<Order, 'id' | 'timestamp' | 'status' | 'timeAgo'>): Promise<string> {
   const ordersRef = collection(db, 'orders');
@@ -43,6 +43,118 @@ export async function createOrder(payload: Omit<Order, 'id' | 'timestamp' | 'sta
   });
 
   return docRef.id;
+}
+
+/**
+ * Creates a new order directly from the Admin Panel with custom status
+ */
+export async function createAdminOrder(payload: Omit<Order, 'id' | 'timeAgo'>): Promise<string> {
+  const ordersRef = collection(db, 'orders');
+  const now = payload.timestamp || Date.now();
+
+  const docRef = await addDoc(ordersRef, {
+    ...payload,
+    timestamp: now,
+    confirmedAt: payload.status === 'confirmed' ? now : null,
+  });
+
+  // If created as confirmed, register in donors and increment campaign counter
+  if (payload.status === 'confirmed') {
+    try {
+      const donorDocRef = doc(db, 'donors', docRef.id);
+      await setDoc(donorDocRef, {
+        name: payload.name,
+        message: payload.message || '',
+        itemSupported: payload.itemSupported || '',
+        city: payload.city || 'Cartagena',
+        timestamp: now,
+        status: 'confirmed',
+      });
+
+      const campaignDocRef = doc(db, 'campaign', 'cartagena2026');
+      await updateDoc(campaignDocRef, {
+        currentCount: increment(1),
+        updatedAt: now,
+      });
+    } catch (e) {
+      console.warn('Error syncing admin created donor:', e);
+    }
+  }
+
+  return docRef.id;
+}
+
+/**
+ * Saves full changes to an existing order (from Admin Edit Modal)
+ */
+export async function saveEditedOrder(
+  orderId: string,
+  updatedData: Partial<Order>,
+  previousStatus: OrderStatus
+): Promise<void> {
+  const orderRef = doc(db, 'orders', orderId);
+  const newStatus = updatedData.status || previousStatus;
+
+  await updateDoc(orderRef, {
+    ...updatedData,
+    confirmedAt: newStatus === 'confirmed' ? (updatedData.confirmedAt || Date.now()) : null,
+  });
+
+  const campaignDocRef = doc(db, 'campaign', 'cartagena2026');
+  const donorDocRef = doc(db, 'donors', orderId);
+
+  // Case 1: Changed from non-confirmed -> confirmed
+  if (newStatus === 'confirmed' && previousStatus !== 'confirmed') {
+    try {
+      await setDoc(donorDocRef, {
+        name: updatedData.name || 'Solidario',
+        message: updatedData.message || '',
+        itemSupported: updatedData.itemSupported || '',
+        city: updatedData.city || 'Cartagena',
+        timestamp: updatedData.timestamp || Date.now(),
+        status: 'confirmed',
+      });
+
+      await updateDoc(campaignDocRef, {
+        currentCount: increment(1),
+        updatedAt: Date.now(),
+      });
+    } catch (e) {
+      console.warn('Error creating donor on confirm:', e);
+    }
+  }
+
+  // Case 2: Changed from confirmed -> non-confirmed
+  else if (previousStatus === 'confirmed' && newStatus !== 'confirmed') {
+    try {
+      await deleteDoc(donorDocRef);
+      await updateDoc(campaignDocRef, {
+        currentCount: increment(-1),
+        updatedAt: Date.now(),
+      });
+    } catch (e) {
+      console.warn('Error removing donor on unconfirm:', e);
+    }
+  }
+
+  // Case 3: Remains confirmed, but name/message/city/itemSupported was edited
+  else if (newStatus === 'confirmed' && previousStatus === 'confirmed') {
+    try {
+      await setDoc(
+        donorDocRef,
+        {
+          name: updatedData.name,
+          message: updatedData.message || '',
+          itemSupported: updatedData.itemSupported || '',
+          city: updatedData.city || 'Cartagena',
+          status: 'confirmed',
+        },
+        { merge: true }
+      );
+    } catch (e) {
+      console.warn('Error updating donor details:', e);
+    }
+  }
 }
 
 /**

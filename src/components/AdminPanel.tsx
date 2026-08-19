@@ -16,9 +16,9 @@ import {
   DollarSign,
   Package,
   ArrowLeft,
-  ChevronRight,
-  Sparkles,
-  AlertCircle
+  Plus,
+  Pencil,
+  AlertCircle,
 } from 'lucide-react';
 import { Order, OrderStatus } from '../types';
 import {
@@ -27,8 +27,9 @@ import {
   deleteOrder,
   verifyAdminAuth,
   subscribeToCampaign,
-  updateCampaignStats
+  updateCampaignStats,
 } from '../services/firebaseService';
+import { AdminOrderModal } from './AdminOrderModal';
 
 interface AdminPanelProps {
   onBackToStore: () => void;
@@ -50,6 +51,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToStore }) => {
   const [selectedFilter, setSelectedFilter] = useState<'all' | OrderStatus>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+
+  // Modal create/edit state
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState<boolean>(false);
+  const [orderToEdit, setOrderToEdit] = useState<Order | null>(null);
 
   // Campaign counter state
   const [campaignStats, setCampaignStats] = useState<{ currentCount: number; totalCount: number }>({
@@ -106,6 +111,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToStore }) => {
     setIsAuthenticated(false);
     localStorage.removeItem('osaneli_admin_auth');
     setPasswordInput('');
+  };
+
+  const handleOpenCreateOrder = () => {
+    setOrderToEdit(null);
+    setIsOrderModalOpen(true);
+  };
+
+  const handleOpenEditOrder = (order: Order) => {
+    setOrderToEdit(order);
+    setIsOrderModalOpen(true);
   };
 
   const handleStatusChange = async (order: Order, newStatus: OrderStatus) => {
@@ -290,6 +305,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToStore }) => {
 
           <div className="flex items-center gap-3">
             <button
+              onClick={handleOpenCreateOrder}
+              className="px-3.5 py-1.5 bg-[#e9c349] hover:bg-[#ffe088] text-[#241a00] font-mono-tag text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[3]" />
+              <span>+ Nuevo Pedido</span>
+            </button>
+
+            <button
               onClick={onBackToStore}
               className="px-3 py-1.5 bg-[#1a221a] border border-[#46464d] text-[#c6c6ce] hover:text-[#dce5d9] hover:border-[#e9c349] font-mono-tag text-[11px] uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer"
             >
@@ -433,15 +456,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToStore }) => {
                 / {campaignStats.totalCount} piezas ({Math.round((campaignStats.currentCount / campaignStats.totalCount) * 100)}%)
               </p>
               <p className="text-[#c6c6ce] text-[12px]">
-                💡 Al presionar <span className="text-emerald-400 font-bold">"Confirmar Pedido"</span> abajo, el sistema incrementa automáticamente este contador y publica el donante en el feed LIVE del sitio.
+                💡 Al presionar <span className="text-emerald-400 font-bold">"Confirmar Pedido"</span> o crear un pedido confirmado, el sistema incrementa automáticamente este contador y publica el donante en el feed LIVE del sitio.
               </p>
             </div>
           )}
         </div>
 
-        {/* Orders Table Section with Search and Filters */}
+        {/* Orders Table Section with Search, Filter and Actions */}
         <div className="bg-[#161d16] border border-[#46464d] p-6 space-y-6">
-          {/* Header Controls: Search + Tabs */}
+          {/* Header Controls: Search + Tabs + Create button */}
           <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 border-b border-[#46464d] pb-5">
             {/* Status Filter Tabs */}
             <div className="flex flex-wrap gap-2">
@@ -493,16 +516,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToStore }) => {
               </button>
             </div>
 
-            {/* Search Box */}
-            <div className="relative min-w-[280px]">
-              <Search className="w-4 h-4 text-[#c6c6ce] absolute left-3 top-3" />
-              <input
-                type="text"
-                placeholder="Buscar por nombre, documento, celular, ciudad..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] pl-9 pr-3 py-2 text-[13px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
-              />
+            {/* Search Box & Action */}
+            <div className="flex items-center gap-3">
+              <div className="relative min-w-[260px]">
+                <Search className="w-4 h-4 text-[#c6c6ce] absolute left-3 top-3" />
+                <input
+                  type="text"
+                  placeholder="Buscar por nombre, documento, celular, ciudad..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] pl-9 pr-3 py-2 text-[13px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
+                />
+              </div>
+
+              <button
+                onClick={handleOpenCreateOrder}
+                className="px-3.5 py-2 bg-[#e9c349] hover:bg-[#ffe088] text-[#241a00] font-mono-tag text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap shadow-sm"
+              >
+                <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                <span>Crear Pedido</span>
+              </button>
             </div>
           </div>
 
@@ -513,14 +546,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToStore }) => {
               <p className="text-[13px]">Cargando pedidos en tiempo real...</p>
             </div>
           ) : filteredOrders.length === 0 ? (
-            <div className="py-16 text-center space-y-2 border border-dashed border-[#46464d] p-8">
+            <div className="py-16 text-center space-y-3 border border-dashed border-[#46464d] p-8">
               <Package className="w-8 h-8 text-[#46464d] mx-auto" />
-              <p className="font-mono-tag text-[14px] text-[#c6c6ce]">
+              <p className="font-mono-tag text-[14px] text-[#dce5d9]">
                 No se encontraron pedidos con los filtros actuales.
               </p>
               <p className="text-[12px] text-[#c6c6ce]/70">
-                Los nuevos pedidos realizados por los usuarios en la tienda aparecerán aquí al instante.
+                Puedes registrar un nuevo pedido manualmente usando el botón superior.
               </p>
+              <button
+                onClick={handleOpenCreateOrder}
+                className="mt-2 px-4 py-2 bg-[#1a221a] border border-[#e9c349] text-[#e9c349] hover:bg-[#e9c349] hover:text-[#241a00] font-mono-tag text-[11px] uppercase font-bold tracking-wider transition-colors cursor-pointer inline-flex items-center gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Registrar Primer Pedido Manual</span>
+              </button>
             </div>
           ) : (
             <div className="space-y-4">
@@ -630,6 +670,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToStore }) => {
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2">
+                        {/* Edit Button */}
+                        <button
+                          onClick={() => handleOpenEditOrder(order)}
+                          className="py-1.5 px-3 bg-[#242c24] border border-[#e9c349]/50 text-[#e9c349] hover:bg-[#e9c349] hover:text-[#241a00] font-mono-tag text-[11px] uppercase font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          <Pencil className="w-3 h-3" />
+                          <span>Editar Pedido</span>
+                        </button>
+
+                        {/* Status change actions */}
                         {order.status !== 'confirmed' && (
                           <button
                             onClick={() => handleStatusChange(order, 'confirmed')}
@@ -680,6 +730,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToStore }) => {
           )}
         </div>
       </main>
+
+      {/* Modal for Creating or Editing Orders */}
+      <AdminOrderModal
+        isOpen={isOrderModalOpen}
+        onClose={() => setIsOrderModalOpen(false)}
+        orderToEdit={orderToEdit}
+      />
     </div>
   );
 };
