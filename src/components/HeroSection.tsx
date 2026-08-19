@@ -5,8 +5,10 @@ import { IMAGES } from '../data/mockData';
 
 interface HeroSectionProps {
   donors: Donor[];
-  currentCount: number;
+  currentCount: number | null;
   totalCount: number;
+  isLoadingCampaign?: boolean;
+  isLoadingDonors?: boolean;
   onOpenJoinModal: () => void;
   onOpenImageLightbox: (url: string, title: string) => void;
 }
@@ -15,10 +17,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   donors,
   currentCount,
   totalCount,
+  isLoadingCampaign = false,
+  isLoadingDonors = false,
   onOpenJoinModal,
   onOpenImageLightbox,
 }) => {
-  const percentage = Math.min(100, Math.round((currentCount / totalCount) * 100));
+  const isCountLoading = isLoadingCampaign || currentCount === null;
+  const safeCount = currentCount ?? 0;
+  const percentage = Math.min(100, Math.round((safeCount / totalCount) * 100));
 
   return (
     <section id="hero-section" className="w-full pt-28 md:pt-36 pb-12 md:pb-20">
@@ -58,26 +64,45 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 Impacto Real
               </span>
               <div className="flex items-baseline gap-1">
-                <span className="font-anybody font-bold text-[32px] text-[#dce5d9] leading-none">
-                  {currentCount}
-                </span>
-                <span className="font-anybody text-[20px] text-[#c6c6ce] leading-none">
-                  /{totalCount}
-                </span>
+                {isCountLoading ? (
+                  <div className="flex items-center gap-1.5 py-1">
+                    <div className="h-7 w-16 bg-[#2f372f] animate-pulse rounded-xs" />
+                    <span className="font-anybody text-[20px] text-[#c6c6ce] leading-none">/{totalCount}</span>
+                  </div>
+                ) : (
+                  <>
+                    <span className="font-anybody font-bold text-[32px] text-[#dce5d9] leading-none animate-fade-in">
+                      {currentCount}
+                    </span>
+                    <span className="font-anybody text-[20px] text-[#c6c6ce] leading-none">
+                      /{totalCount}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
 
-            {/* Progress Bar with pulse */}
-            <div className="h-3 w-full bg-[#2f372f] overflow-hidden relative">
-              <div
-                className="h-full bg-[#e9c349] progress-pulse transition-all duration-700 ease-out"
-                style={{ width: `${percentage}%` }}
-              />
-            </div>
+            {/* Progress Bar with pulse or skeleton */}
+            {isCountLoading ? (
+              <div className="h-3 w-full bg-[#242c24] overflow-hidden relative">
+                <div className="h-full w-2/4 bg-[#2f372f] animate-pulse" />
+              </div>
+            ) : (
+              <div className="h-3 w-full bg-[#2f372f] overflow-hidden relative">
+                <div
+                  className="h-full bg-[#e9c349] progress-pulse transition-all duration-700 ease-out"
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+            )}
 
-            <div className="flex justify-between text-[#c6c6ce] text-[12px] font-mono-tag tracking-wider">
+            <div className="flex justify-between text-[#c6c6ce] text-[12px] font-mono-tag tracking-wider items-center">
               <span>Piezas con propósito</span>
-              <span className="text-[#e9c349] font-bold">{percentage}% Completado</span>
+              {isCountLoading ? (
+                <div className="h-4 w-28 bg-[#2f372f] animate-pulse rounded-xs" />
+              ) : (
+                <span className="text-[#e9c349] font-bold">{percentage}% Completado</span>
+              )}
             </div>
           </div>
 
@@ -132,33 +157,51 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </div>
             </div>
 
-            {/* Live Donors List */}
+            {/* Live Donors List / Skeleton */}
             <div className="flex-grow p-4 overflow-y-auto space-y-4 max-h-[380px] custom-scrollbar mask-image-bottom">
-              {donors.map((donor, idx) => (
-                <div
-                  key={donor.id}
-                  className={`flex items-start gap-3 transition-opacity duration-300 ${
-                    idx === 0 ? 'opacity-100' : idx === 1 ? 'opacity-90' : idx === 2 ? 'opacity-70' : 'opacity-50'
-                  }`}
-                >
-                  <div className="w-8 h-8 rounded-full bg-[#2f372f] border border-[#46464d] flex-shrink-0 flex items-center justify-center text-[#e9c349]">
-                    <User className="w-4 h-4" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium text-[#dce5d9] leading-tight truncate">
-                      {donor.name} se unió al movimiento
-                    </p>
-                    {donor.message && (
-                      <p className="text-[12px] text-[#c6c6ce]/80 italic mt-0.5 line-clamp-1">
-                        "{donor.message}"
-                      </p>
-                    )}
-                    <p className="font-mono-tag text-[10px] text-[#c6c6ce]/60 mt-1 uppercase tracking-wider">
-                      {donor.timeAgo}
-                    </p>
-                  </div>
+              {isLoadingDonors && donors.length === 0 ? (
+                <div className="space-y-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="flex items-start gap-3 animate-pulse">
+                      <div className="w-8 h-8 rounded-full bg-[#2f372f] flex-shrink-0" />
+                      <div className="flex-1 space-y-1.5 py-1">
+                        <div className="h-3.5 bg-[#2f372f] rounded-xs w-3/4" />
+                        <div className="h-2.5 bg-[#242c24] rounded-xs w-1/2" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : donors.length === 0 ? (
+                <div className="py-8 text-center text-[12px] text-[#c6c6ce] font-mono-tag">
+                  Sé el primero en unirte al movimiento.
+                </div>
+              ) : (
+                donors.map((donor, idx) => (
+                  <div
+                    key={donor.id}
+                    className={`flex items-start gap-3 transition-opacity duration-300 ${
+                      idx === 0 ? 'opacity-100' : idx === 1 ? 'opacity-90' : idx === 2 ? 'opacity-70' : 'opacity-50'
+                    }`}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-[#2f372f] border border-[#46464d] flex-shrink-0 flex items-center justify-center text-[#e9c349]">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-medium text-[#dce5d9] leading-tight truncate">
+                        {donor.name} se unió al movimiento
+                      </p>
+                      {donor.message && (
+                        <p className="text-[12px] text-[#c6c6ce]/80 italic mt-0.5 line-clamp-1">
+                          "{donor.message}"
+                        </p>
+                      )}
+                      <p className="font-mono-tag text-[10px] text-[#c6c6ce]/60 mt-1 uppercase tracking-wider">
+                        {donor.timeAgo}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             {/* Quick Action in Card */}
@@ -202,25 +245,44 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               Impacto Real
             </span>
             <div className="flex items-baseline gap-1">
-              <span className="font-anybody font-bold text-[28px] text-[#e9c349] leading-none">
-                {currentCount}
-              </span>
-              <span className="font-anybody text-[18px] text-[#c6c6ce] leading-none">
-                /{totalCount}
-              </span>
+              {isCountLoading ? (
+                <div className="flex items-center gap-1.5 py-0.5">
+                  <div className="h-6 w-14 bg-[#2f372f] animate-pulse rounded-xs" />
+                  <span className="font-anybody text-[18px] text-[#c6c6ce] leading-none">/{totalCount}</span>
+                </div>
+              ) : (
+                <>
+                  <span className="font-anybody font-bold text-[28px] text-[#e9c349] leading-none animate-fade-in">
+                    {currentCount}
+                  </span>
+                  <span className="font-anybody text-[18px] text-[#c6c6ce] leading-none">
+                    /{totalCount}
+                  </span>
+                </>
+              )}
             </div>
           </div>
 
-          <div className="h-3 w-full bg-[#2f372f] overflow-hidden relative">
-            <div
-              className="h-full bg-[#e9c349] progress-pulse"
-              style={{ width: `${percentage}%` }}
-            />
-          </div>
+          {isCountLoading ? (
+            <div className="h-3 w-full bg-[#242c24] overflow-hidden relative">
+              <div className="h-full w-2/4 bg-[#2f372f] animate-pulse" />
+            </div>
+          ) : (
+            <div className="h-3 w-full bg-[#2f372f] overflow-hidden relative">
+              <div
+                className="h-full bg-[#e9c349] progress-pulse"
+                style={{ width: `${percentage}%` }}
+              />
+            </div>
+          )}
 
-          <div className="flex justify-between text-[#c6c6ce] text-[11px] font-mono-tag">
+          <div className="flex justify-between text-[#c6c6ce] text-[11px] font-mono-tag items-center">
             <span>Piezas con propósito</span>
-            <span className="text-[#e9c349] font-bold">{percentage}% Completado</span>
+            {isCountLoading ? (
+              <div className="h-3.5 w-24 bg-[#2f372f] animate-pulse rounded-xs" />
+            ) : (
+              <span className="text-[#e9c349] font-bold">{percentage}% Completado</span>
+            )}
           </div>
         </div>
 
@@ -234,17 +296,35 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </span>
               Donantes en vivo
             </span>
-            <span className="font-mono-tag text-[10px] text-[#c6c6ce]">{donors.length} registrados</span>
+            <span className="font-mono-tag text-[10px] text-[#c6c6ce]">
+              {isLoadingDonors ? 'Cargando...' : `${donors.length} registrados`}
+            </span>
           </div>
 
           <div className="space-y-2.5 max-h-36 overflow-y-auto custom-scrollbar">
-            {donors.slice(0, 4).map((donor, idx) => (
-              <div key={donor.id} className="flex items-center gap-2.5 text-[13px] text-[#dce5d9]">
-                <Heart className="w-3.5 h-3.5 text-[#e9c349] fill-[#e9c349] flex-shrink-0" />
-                <span className="truncate">{donor.name} se unió al movimiento</span>
-                <span className="text-[10px] font-mono-tag text-[#c6c6ce] ml-auto flex-shrink-0">{donor.timeAgo}</span>
+            {isLoadingDonors && donors.length === 0 ? (
+              <div className="space-y-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-2.5 animate-pulse">
+                    <div className="w-3.5 h-3.5 rounded-full bg-[#2f372f]" />
+                    <div className="h-3 bg-[#2f372f] rounded-xs w-2/3" />
+                    <div className="h-2.5 bg-[#242c24] rounded-xs w-12 ml-auto" />
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : donors.length === 0 ? (
+              <div className="py-2 text-[12px] text-[#c6c6ce] font-mono-tag">
+                Sé el primero en unirte al movimiento.
+              </div>
+            ) : (
+              donors.slice(0, 4).map((donor) => (
+                <div key={donor.id} className="flex items-center gap-2.5 text-[13px] text-[#dce5d9]">
+                  <Heart className="w-3.5 h-3.5 text-[#e9c349] fill-[#e9c349] flex-shrink-0" />
+                  <span className="truncate">{donor.name} se unió al movimiento</span>
+                  <span className="text-[10px] font-mono-tag text-[#c6c6ce] ml-auto flex-shrink-0">{donor.timeAgo}</span>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

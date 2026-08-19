@@ -79,11 +79,11 @@ export const COLLECTION_PIECES: CollectionPiece[] = [
     priceCOP: 120000,
     editionNumber: 143,
     totalEdition: 200,
-    description: 'Camiseta de corte boxy en algodón pesado 280 GSM con gráfica conmemorativa "TODOS SOMOS COLOMBIA - CARTAGENA 2026" en serigrafía de alta densidad y certificado numerado.',
+    description: 'Corte regular fit.',
     features: [
-      '100% Algodón Premium Colombiano (280 GSM)',
-      'Gráfica oficial conmemorativa Cartagena 10 Agosto 2026',
-      'Confección de alta densidad con propósito solidario',
+      'Corte Regular Fit',
+      '100% Algodón Premium Colombiano',
+      'Gráfica oficial conmemorativa Cartagena 2026',
       'Edición seriada y limitada'
     ]
   },
@@ -98,12 +98,12 @@ export const COLLECTION_PIECES: CollectionPiece[] = [
     priceCOP: 150000,
     editionNumber: 144,
     totalEdition: 200,
-    description: 'Bermuda utilitaria en denim rígido de 13.5 oz con bolsillos tácticos cargo, detalles desgastados y bordado en hilo dorado OSANELI.',
+    description: 'Corte regular fit.',
     features: [
-      'Denim 100% algodón rígido 13.5 oz',
+      'Corte Regular Fit',
+      'Denim 100% algodón rígido',
       'Bolsillos utilitarios reforzados',
-      'Bordado exclusivo de edición Cartagena 2026',
-      'Herrajes metálicos anticorrosivos'
+      'Edición seriada y limitada'
     ]
   }
 ];

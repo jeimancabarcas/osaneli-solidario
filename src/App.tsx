@@ -10,7 +10,6 @@ import { LightboxModal } from './components/LightboxModal';
 import { SolidarityPolicyModal } from './components/SolidarityPolicyModal';
 import { ImpactReportModal } from './components/ImpactReportModal';
 import { ContactModal } from './components/ContactModal';
-import { COLLECTION_PIECES, INITIAL_DONORS } from './data/mockData';
 import { Donor, CartItem, CollectionPiece } from './types';
 import {
   subscribeToDonors,
@@ -18,9 +17,11 @@ import {
 } from './services/firebaseService';
 
 export default function App() {
-  const [donors, setDonors] = useState<Donor[]>(INITIAL_DONORS);
-  const [currentCount, setCurrentCount] = useState<number>(142);
+  const [donors, setDonors] = useState<Donor[]>([]);
+  const [currentCount, setCurrentCount] = useState<number | null>(null);
   const [totalCount, setTotalCount] = useState<number>(200);
+  const [isLoadingCampaign, setIsLoadingCampaign] = useState<boolean>(true);
+  const [isLoadingDonors, setIsLoadingDonors] = useState<boolean>(true);
 
   // Cart state - empty by default
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -45,11 +46,13 @@ export default function App() {
   useEffect(() => {
     const unsubDonors = subscribeToDonors((realtimeDonors) => {
       setDonors(realtimeDonors);
+      setIsLoadingDonors(false);
     });
 
     const unsubCampaign = subscribeToCampaign((stats) => {
       setCurrentCount(stats.currentCount);
       setTotalCount(stats.totalCount);
+      setIsLoadingCampaign(false);
     });
 
     return () => {
@@ -130,6 +133,8 @@ export default function App() {
           donors={donors}
           currentCount={currentCount}
           totalCount={totalCount}
+          isLoadingCampaign={isLoadingCampaign}
+          isLoadingDonors={isLoadingDonors}
           onOpenJoinModal={() => {
             setSelectedPieceForJoin(null);
             setIsJoinModalOpen(true);
@@ -199,7 +204,7 @@ export default function App() {
       <ImpactReportModal
         isOpen={isReportOpen}
         onClose={() => setIsReportOpen(false)}
-        currentCount={currentCount}
+        currentCount={currentCount ?? 0}
       />
 
       <ContactModal
