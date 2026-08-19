@@ -30,6 +30,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const [address, setAddress] = useState('');
   const [orderNotes, setOrderNotes] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [whatsappUrl, setWhatsappUrl] = useState('');
 
   if (!isOpen) return null;
@@ -37,8 +38,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const subtotalCOP = items.reduce((acc, item) => acc + item.piece.priceCOP * item.quantity, 0);
   const WHATSAPP_NUMBER = '573236737646';
 
-  const handleCheckout = (e: React.FormEvent) => {
+  const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const finalName = buyerName.trim() || 'Comprador Solidario';
 
     // Construct items bullet points
@@ -67,26 +69,30 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     setWhatsappUrl(generatedUrl);
 
     // Save order in Firestore in pending status
-    createOrder({
-      name: finalName,
-      docType,
-      docNumber: docNumber.trim(),
-      phoneNumber: phoneNumber.trim(),
-      city: city.trim() || 'Cartagena',
-      address: address.trim(),
-      message: orderNotes.trim(),
-      itemSupported: items.map((i) => `${i.piece.name} (${i.size}) x${i.quantity}`).join(', '),
-      items: items.map((i) => ({
-        pieceId: i.piece.id,
-        name: i.piece.name,
-        size: i.size,
-        quantity: i.quantity,
-        priceCOP: i.piece.priceCOP,
-      })),
-      totalAmount: subtotalCOP,
-    }).catch((err) => {
+    try {
+      await createOrder({
+        name: finalName,
+        docType,
+        docNumber: docNumber.trim(),
+        phoneNumber: phoneNumber.trim(),
+        city: city.trim() || 'Cartagena',
+        address: address.trim(),
+        message: orderNotes.trim(),
+        itemSupported: items.map((i) => `${i.piece.name} (${i.size}) x${i.quantity}`).join(', '),
+        items: items.map((i) => ({
+          pieceId: i.piece.id,
+          name: i.piece.name,
+          size: i.size,
+          quantity: i.quantity,
+          priceCOP: i.piece.priceCOP,
+        })),
+        totalAmount: subtotalCOP,
+      });
+    } catch (err) {
       console.warn('Error recording cart order in Firestore:', err);
-    });
+    } finally {
+      setIsSubmitting(false);
+    }
 
     onCheckoutSuccess(finalName, `Adquirió ${items.length} piezas solidarias para Cartagena.`);
     setIsSuccess(true);
@@ -369,10 +375,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
                   <button
                     type="submit"
-                    className="w-full py-3.5 bg-[#25D366] text-[#0a1a0f] font-mono-tag font-bold text-[13px] uppercase tracking-wider hover:bg-[#20bd5a] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                    disabled={isSubmitting}
+                    className="w-full py-3.5 bg-[#25D366] text-[#0a1a0f] font-mono-tag font-bold text-[13px] uppercase tracking-wider hover:bg-[#20bd5a] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg disabled:opacity-60"
                   >
                     <MessageCircle className="w-5 h-5 fill-current" />
-                    <span>Finalizar Pedido por WhatsApp</span>
+                    <span>{isSubmitting ? 'Registrando pedido y abriendo WhatsApp...' : 'Finalizar Pedido por WhatsApp'}</span>
                   </button>
                 </form>
               </div>

@@ -29,6 +29,7 @@ export const JoinModal: React.FC<JoinModalProps> = ({
   const [address, setAddress] = useState<string>('');
   const [message, setMessage] = useState<string>('');
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [whatsappUrl, setWhatsappUrl] = useState<string>('');
 
   if (!isOpen) return null;
@@ -36,8 +37,10 @@ export const JoinModal: React.FC<JoinModalProps> = ({
   const currentPiece = COLLECTION_PIECES.find((p) => p.id === selectedPieceId) || COLLECTION_PIECES[0];
   const WHATSAPP_NUMBER = '573236737646';
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     const finalName = donorName.trim() || 'Solidario Anónimo';
     const finalMessage = message.trim();
     const itemSupported = `${currentPiece.name} (Talla ${size})`;
@@ -60,28 +63,32 @@ export const JoinModal: React.FC<JoinModalProps> = ({
     setWhatsappUrl(generatedUrl);
 
     // Save order automatically into database in pending status
-    createOrder({
-      name: finalName,
-      docType,
-      docNumber: docNumber.trim(),
-      phoneNumber: phoneNumber.trim(),
-      city: city.trim() || 'Cartagena',
-      address: address.trim(),
-      message: finalMessage,
-      itemSupported,
-      items: [
-        {
-          pieceId: currentPiece.id,
-          name: currentPiece.name,
-          size,
-          quantity: 1,
-          priceCOP: currentPiece.priceCOP,
-        },
-      ],
-      totalAmount: currentPiece.priceCOP,
-    }).catch((err) => {
+    try {
+      await createOrder({
+        name: finalName,
+        docType,
+        docNumber: docNumber.trim(),
+        phoneNumber: phoneNumber.trim(),
+        city: city.trim() || 'Cartagena',
+        address: address.trim(),
+        message: finalMessage,
+        itemSupported,
+        items: [
+          {
+            pieceId: currentPiece.id,
+            name: currentPiece.name,
+            size,
+            quantity: 1,
+            priceCOP: currentPiece.priceCOP,
+          },
+        ],
+        totalAmount: currentPiece.priceCOP,
+      });
+    } catch (err) {
       console.warn('Error recording order in Firestore:', err);
-    });
+    } finally {
+      setIsSubmitting(false);
+    }
 
     onJoinSuccess(finalName, finalMessage, itemSupported);
     setIsSuccess(true);
@@ -349,10 +356,11 @@ export const JoinModal: React.FC<JoinModalProps> = ({
 
               <button
                 type="submit"
-                className="w-full py-4 bg-[#25D366] text-[#0a1a0f] font-mono-tag font-bold text-[13px] uppercase tracking-wider hover:bg-[#20bd5a] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                disabled={isSubmitting}
+                className="w-full py-4 bg-[#25D366] text-[#0a1a0f] font-mono-tag font-bold text-[13px] uppercase tracking-wider hover:bg-[#20bd5a] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg disabled:opacity-60"
               >
                 <MessageCircle className="w-5 h-5 fill-current" />
-                <span>Confirmar Pedido por WhatsApp</span>
+                <span>{isSubmitting ? 'Registrando pedido y abriendo WhatsApp...' : 'Confirmar Pedido por WhatsApp'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
