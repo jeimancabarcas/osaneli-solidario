@@ -173,9 +173,6 @@ export default function App() {
       <MenuDrawer
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        onOpenPolicy={() => setIsPolicyOpen(true)}
-        onOpenReport={() => setIsReportOpen(true)}
-        onOpenContact={() => setIsContactOpen(true)}
         onOpenJoin={() => {
           setSelectedPieceForJoin(null);
           setIsJoinModalOpen(true);

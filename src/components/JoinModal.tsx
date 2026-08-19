@@ -40,7 +40,7 @@ export const JoinModal: React.FC<JoinModalProps> = ({
     const textToSend = `¡Hola OSANELI! Deseo adquirir una pieza de la colección solidaria Cartagena 2026:\n\n` +
       `• *Pieza:* ${currentPiece.name}\n` +
       `• *Talla:* ${size}\n` +
-      `• *Precio:* $${currentPiece.priceUSD} USD (≈ $${currentPiece.priceCOP.toLocaleString()} COP)\n` +
+      `• *Precio:* COP $${currentPiece.priceCOP.toLocaleString()}\n` +
       `• *Nombre del comprador:* ${finalName}\n` +
       `• *Ciudad/Ubicación:* ${phoneCity || 'Cartagena'}\n` +
       (finalMessage ? `• *Mensaje de apoyo:* "${finalMessage}"\n\n` : '\n') +
@@ -99,7 +99,7 @@ export const JoinModal: React.FC<JoinModalProps> = ({
             <div className="p-4 bg-[#1a221a] border border-[#46464d] text-left text-[13px] font-mono-tag space-y-1">
               <p className="text-[#e9c349] font-bold">RESUMEN DE ADQUISICIÓN</p>
               <p className="text-[#c6c6ce]">Prenda: <span className="text-[#dce5d9] font-bold">{currentPiece.name} (Talla {size})</span></p>
-              <p className="text-[#c6c6ce]">Valor: <span className="text-[#e9c349] font-bold">${currentPiece.priceUSD} USD (≈ ${currentPiece.priceCOP.toLocaleString()} COP)</span></p>
+              <p className="text-[#c6c6ce]">Valor: <span className="text-[#e9c349] font-bold">COP ${currentPiece.priceCOP.toLocaleString()}</span></p>
               <p className="text-[#c6c6ce]">Comprador: <span className="text-[#dce5d9]">{donorName || 'Solidario Anónimo'}</span></p>
               <p className="text-[#c6c6ce]">WhatsApp Oficial: <span className="text-[#25D366] font-bold">+57 323 6737646</span></p>
             </div>
@@ -127,7 +127,7 @@ export const JoinModal: React.FC<JoinModalProps> = ({
           <div className="space-y-6">
             <div className="space-y-1 border-b border-[#46464d] pb-4">
               <span className="font-mono-tag text-[11px] text-[#e9c349] uppercase tracking-[0.2em] font-bold flex items-center gap-1.5">
-                <Heart className="w-3.5 h-3.5 fill-[#e9c349]" /> 100% Destinado a la Causa · Cartagena 2026
+                <Heart className="w-3.5 h-3.5 fill-[#e9c349]" /> Edición Conmemorativa Limitada · Cartagena 2026
               </span>
               <h3 className="font-anybody text-[24px] md:text-[28px] font-bold text-[#dce5d9] uppercase tracking-tight">
                 Adquirir Pieza Solidaria
@@ -163,8 +163,8 @@ export const JoinModal: React.FC<JoinModalProps> = ({
                         <span className="font-anybody text-[14px] font-bold text-[#dce5d9] leading-tight">
                           {piece.name}
                         </span>
-                        <span className="font-mono-tag text-[12px] text-[#e9c349] font-bold">
-                          ${piece.priceUSD} USD (≈ ${piece.priceCOP.toLocaleString()} COP)
+                        <span className="font-mono-tag text-[13px] text-[#e9c349] font-bold">
+                          COP ${piece.priceCOP.toLocaleString()}
                         </span>
                       </button>
                     );

@@ -36,10 +36,10 @@ export const SolidarityPolicyModal: React.FC<PolicyModalProps> = ({ isOpen, onCl
           <div className="space-y-4 text-[14px] leading-relaxed text-[#c6c6ce]">
             <div className="p-4 bg-[#1a221a] border border-[#46464d] space-y-2">
               <h4 className="font-anybody text-[16px] text-[#e9c349] font-bold uppercase flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4" /> 1. Destino del 100% de los Fondos Netos
+                <ShieldCheck className="w-4 h-4" /> 1. Adquisición y Propósito Solidario
               </h4>
               <p>
-                La totalidad de los ingresos obtenidos mediante la adquisición de las piezas seriadas de la colección (Camiseta y Short en Cartagena 2026) son transferidos sin intermediarios a brigadas locales y centros de acopio certificados en las comunidades afectadas. Los pedidos se gestionan de forma personalizada y directa a través del canal oficial de WhatsApp (+57 323 6737646).
+                La adquisición de las piezas seriadas de la colección (Camiseta $120.000 COP y Short $150.000 COP en Cartagena 2026) apoya directamente la causa comunitaria. Los pedidos se gestionan de forma personalizada y directa a través del canal oficial de WhatsApp (+57 323 6737646).
               </p>
             </div>
 

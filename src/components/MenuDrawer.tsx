@@ -1,21 +1,15 @@
 import React from 'react';
-import { X, ArrowUpRight, Heart, FileText, BarChart2, Mail, ExternalLink } from 'lucide-react';
+import { X, ArrowUpRight, Heart } from 'lucide-react';
 
 interface MenuDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  onOpenPolicy: () => void;
-  onOpenReport: () => void;
-  onOpenContact: () => void;
   onOpenJoin: () => void;
 }
 
 export const MenuDrawer: React.FC<MenuDrawerProps> = ({
   isOpen,
   onClose,
-  onOpenPolicy,
-  onOpenReport,
-  onOpenContact,
   onOpenJoin,
 }) => {
   if (!isOpen) return null;
@@ -42,7 +36,7 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
           <button
             onClick={onClose}
             aria-label="Cerrar menú"
-            className="text-[#c6c6ce] hover:text-[#e9c349] transition-colors p-1"
+            className="text-[#c6c6ce] hover:text-[#e9c349] transition-colors p-1 cursor-pointer"
           >
             <X className="w-6 h-6" />
           </button>
@@ -54,10 +48,10 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
             <span className="font-mono-tag text-[10px] text-[#e9c349] uppercase tracking-[0.2em] font-bold">
               Navegación
             </span>
-            <nav className="flex flex-col space-y-3 pt-2">
+            <nav className="flex flex-col space-y-4 pt-3">
               <button
                 onClick={() => scrollTo('hero-section')}
-                className="text-left font-anybody text-[20px] font-bold uppercase text-[#dce5d9] hover:text-[#e9c349] transition-colors flex items-center justify-between group"
+                className="text-left font-anybody text-[20px] font-bold uppercase text-[#dce5d9] hover:text-[#e9c349] transition-colors flex items-center justify-between group cursor-pointer"
               >
                 <span>01. Todos Somos Colombia</span>
                 <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-[#e9c349]" />
@@ -65,7 +59,7 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
 
               <button
                 onClick={() => scrollTo('context-section')}
-                className="text-left font-anybody text-[20px] font-bold uppercase text-[#dce5d9] hover:text-[#e9c349] transition-colors flex items-center justify-between group"
+                className="text-left font-anybody text-[20px] font-bold uppercase text-[#dce5d9] hover:text-[#e9c349] transition-colors flex items-center justify-between group cursor-pointer"
               >
                 <span>02. El Contexto / La Realidad</span>
                 <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-[#e9c349]" />
@@ -73,52 +67,12 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
 
               <button
                 onClick={() => scrollTo('context-section')}
-                className="text-left font-anybody text-[20px] font-bold uppercase text-[#dce5d9] hover:text-[#e9c349] transition-colors flex items-center justify-between group"
+                className="text-left font-anybody text-[20px] font-bold uppercase text-[#dce5d9] hover:text-[#e9c349] transition-colors flex items-center justify-between group cursor-pointer"
               >
                 <span>03. La Colección (Camiseta & Short)</span>
                 <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-[#e9c349]" />
               </button>
             </nav>
-          </div>
-
-          <div className="border-t border-[#46464d] pt-6 space-y-3">
-            <span className="font-mono-tag text-[10px] text-[#e9c349] uppercase tracking-[0.2em] font-bold">
-              Transparencia y Acción
-            </span>
-            <div className="space-y-2 font-mono-tag text-[13px]">
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenPolicy();
-                }}
-                className="w-full text-left py-2 px-3 bg-[#1a221a] hover:bg-[#242c24] border border-[#46464d] hover:border-[#e9c349] transition-colors flex items-center gap-2.5 text-[#dce5d9]"
-              >
-                <FileText className="w-4 h-4 text-[#e9c349]" />
-                <span>Solidarity Policy</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenReport();
-                }}
-                className="w-full text-left py-2 px-3 bg-[#1a221a] hover:bg-[#242c24] border border-[#46464d] hover:border-[#e9c349] transition-colors flex items-center gap-2.5 text-[#dce5d9]"
-              >
-                <BarChart2 className="w-4 h-4 text-[#e9c349]" />
-                <span>Impact Report (Auditoría)</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenContact();
-                }}
-                className="w-full text-left py-2 px-3 bg-[#1a221a] hover:bg-[#242c24] border border-[#46464d] hover:border-[#e9c349] transition-colors flex items-center gap-2.5 text-[#dce5d9]"
-              >
-                <Mail className="w-4 h-4 text-[#e9c349]" />
-                <span>Contacto Directo / Brigadas</span>
-              </button>
-            </div>
           </div>
         </div>
 
@@ -129,10 +83,10 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
               onClose();
               onOpenJoin();
             }}
-            className="w-full py-3 bg-[#e9c349] text-[#241a00] font-mono-tag font-bold text-[12px] uppercase tracking-wider hover:bg-[#ffe088] transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3.5 bg-[#e9c349] text-[#241a00] font-mono-tag font-bold text-[12px] uppercase tracking-wider hover:bg-[#ffe088] transition-colors flex items-center justify-center gap-2 cursor-pointer"
           >
             <Heart className="w-4 h-4 fill-[#241a00]" />
-            <span>Únete al Movimiento</span>
+            <span>Adquirir Pieza Solidaria</span>
           </button>
           <p className="font-mono-tag text-[10px] text-[#c6c6ce] text-center">
             OSANELI © 2026 · CARTAGENA DE INDIAS, COLOMBIA

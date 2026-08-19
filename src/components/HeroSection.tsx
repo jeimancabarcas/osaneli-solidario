@@ -44,7 +44,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               Estamos creando 200 piezas con un propósito.
             </p>
             <p className="text-[15px] leading-[24px] text-[#c6c6ce]">
-              Esta no es solo una colección; es un movimiento de solidaridad. Cada pieza representa un compromiso directo con el cambio. El 100% de los fondos de esta edición limitada serán destinados a iniciativas de apoyo directo.
+              Esta no es solo una colección; es un movimiento de solidaridad. Cada pieza representa un compromiso directo con el cambio y la resiliencia comunitaria en Cartagena 2026.
             </p>
           </div>
 

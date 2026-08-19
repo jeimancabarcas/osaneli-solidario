@@ -111,7 +111,7 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
               <span className="text-[#c6c6ce] text-[11px] font-normal">2 PIEZAS · 200 UNIDADES</span>
             </h3>
             <p className="text-[15px] md:text-[16px] leading-[24px] text-[#c6c6ce]">
-              Transformamos la solidaridad en arte tangible con dos piezas exclusivas: la camiseta conmemorativa y el short de denim utilitario, canalizando el 100% del apoyo a Cartagena.
+              Transformamos la solidaridad en arte tangible con dos piezas exclusivas: la camiseta conmemorativa y el short de denim utilitario para Cartagena 2026.
             </p>
           </div>
 
@@ -156,7 +156,7 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
               </div>
               <div className="p-3 bg-[#161d16] border-t border-[#46464d] flex justify-between items-center text-[12px] font-mono-tag text-[#c6c6ce]">
                 <span>CAMISETA & SHORT · SERIE 1 - 200</span>
-                <span className="text-[#e9c349]">100% FONDOS DE APOYO</span>
+                <span className="text-[#e9c349]">EDICIÓN LIMITADA</span>
               </div>
             </div>
           </div>
@@ -218,8 +218,8 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
                 </div>
 
                 <div className="flex justify-between items-center pt-2 border-t border-[#46464d]/60 w-full">
-                  <span className="font-mono-tag text-[14px] font-bold text-[#e9c349]">
-                    ${piece.priceUSD} USD <span className="text-[11px] text-[#c6c6ce] font-normal">(≈ ${piece.priceCOP.toLocaleString()} COP)</span>
+                  <span className="font-mono-tag text-[15px] font-bold text-[#e9c349]">
+                    COP ${piece.priceCOP.toLocaleString()}
                   </span>
                   <span className="font-mono-tag text-[11px] text-[#dce5d9] bg-[#161d16] px-2.5 py-1 border border-[#46464d]">
                     {isSelected ? '✓ SELECCIONADO' : 'SELECCIONAR'}
@@ -294,7 +294,7 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
               ) : (
                 <>
                   <ShoppingBag className="w-4 h-4" />
-                  <span>Adquirir pieza (${selectedPiece.priceUSD} USD)</span>
+                  <span>Adquirir pieza (COP ${selectedPiece.priceCOP.toLocaleString()})</span>
                 </>
               )}
             </button>

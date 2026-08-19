@@ -29,7 +29,6 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
   if (!isOpen) return null;
 
-  const subtotalUSD = items.reduce((acc, item) => acc + item.piece.priceUSD * item.quantity, 0);
   const subtotalCOP = items.reduce((acc, item) => acc + item.piece.priceCOP * item.quantity, 0);
   const WHATSAPP_NUMBER = '573236737646';
 
@@ -41,7 +40,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     const itemsList = items
       .map(
         (item, idx) =>
-          `${idx + 1}. *${item.piece.name}* (Talla ${item.size}) x ${item.quantity} - $${item.piece.priceUSD * item.quantity} USD (≈ $${(item.piece.priceCOP * item.quantity).toLocaleString()} COP)`
+          `${idx + 1}. *${item.piece.name}* (Talla ${item.size}) x ${item.quantity} - COP $${(item.piece.priceCOP * item.quantity).toLocaleString()}`
       )
       .join('\n');
 
@@ -52,7 +51,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       (orderNotes ? `• *Notas:* ${orderNotes}\n\n` : '\n') +
       `*Resumen del Pedido:*\n` +
       `${itemsList}\n\n` +
-      `*Total a Pagar:* $${subtotalUSD} USD (≈ $${subtotalCOP.toLocaleString()} COP)\n\n` +
+      `*Total a Pagar:* COP $${subtotalCOP.toLocaleString()}\n\n` +
       `Quedo atento a las instrucciones para efectuar el pago y la entrega. ¡Gracias!`;
 
     const generatedUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(messageText)}`;
@@ -115,7 +114,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <p className="text-[#e9c349] font-bold">DETALLE DE COMPRA</p>
               <p className="text-[#c6c6ce]">Comprador: <span className="text-[#dce5d9]">{buyerName || 'Comprador Solidario'}</span></p>
               <p className="text-[#c6c6ce]">Destino: <span className="text-[#dce5d9]">{buyerCity || 'Cartagena'}</span></p>
-              <p className="text-[#c6c6ce]">Total: <span className="text-[#e9c349] font-bold">${subtotalUSD} USD (≈ ${subtotalCOP.toLocaleString()} COP)</span></p>
+              <p className="text-[#c6c6ce]">Total: <span className="text-[#e9c349] font-bold">COP ${subtotalCOP.toLocaleString()}</span></p>
               <p className="text-[#c6c6ce]">WhatsApp: <span className="text-[#25D366] font-bold">+57 323 6737646</span></p>
             </div>
 
@@ -147,7 +146,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <ShoppingBag className="w-12 h-12 text-[#46464d]" />
                   <p className="font-mono-tag text-[13px] text-[#c6c6ce]">Tu bolsa está vacía.</p>
                   <p className="text-[13px] text-[#c6c6ce]/70 max-w-xs">
-                    Elige la Camiseta o el Short de la colección Cartagena 2026 para iniciar tu orden.
+                    Elige la Camiseta ($120.000 COP) o el Short ($150.000 COP) de la colección Cartagena 2026 para iniciar tu orden.
                   </p>
                 </div>
               ) : (
@@ -198,10 +197,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
                       <div className="text-right">
                         <div className="font-mono-tag font-bold text-[14px] text-[#e9c349]">
-                          ${item.piece.priceUSD * item.quantity} USD
-                        </div>
-                        <div className="font-mono-tag text-[10px] text-[#c6c6ce]">
-                          ≈ ${(item.piece.priceCOP * item.quantity).toLocaleString()} COP
+                          COP ${(item.piece.priceCOP * item.quantity).toLocaleString()}
                         </div>
                       </div>
                     </div>
@@ -216,15 +212,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 <div className="space-y-1.5 text-[13px] font-mono-tag">
                   <div className="flex justify-between text-[#c6c6ce]">
                     <span>Subtotal</span>
-                    <span className="text-[#dce5d9] font-bold">${subtotalUSD} USD</span>
-                  </div>
-                  <div className="flex justify-between text-[#c6c6ce]">
-                    <span>En pesos (COP)</span>
-                    <span className="text-[#dce5d9] font-bold">${subtotalCOP.toLocaleString()} COP</span>
+                    <span className="text-[#dce5d9] font-bold">COP ${subtotalCOP.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-[16px] font-bold pt-2 border-t border-[#46464d] text-[#dce5d9]">
                     <span>Total Pedido</span>
-                    <span className="text-[#e9c349]">${subtotalUSD} USD</span>
+                    <span className="text-[#e9c349]">COP ${subtotalCOP.toLocaleString()}</span>
                   </div>
                 </div>
 
