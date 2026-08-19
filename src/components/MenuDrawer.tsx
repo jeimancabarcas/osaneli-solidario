@@ -75,7 +75,7 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
                 onClick={() => scrollTo('context-section')}
                 className="text-left font-anybody text-[20px] font-bold uppercase text-[#dce5d9] hover:text-[#e9c349] transition-colors flex items-center justify-between group"
               >
-                <span>03. La Colección (200 Piezas)</span>
+                <span>03. La Colección (Camiseta & Short)</span>
                 <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-[#e9c349]" />
               </button>
             </nav>
@@ -135,7 +135,7 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
             <span>Únete al Movimiento</span>
           </button>
           <p className="font-mono-tag text-[10px] text-[#c6c6ce] text-center">
-            OSANELI © 2024 - BOGOTÁ / MEDELLÍN / CALI
+            OSANELI © 2026 · CARTAGENA DE INDIAS, COLOMBIA
           </p>
         </div>
       </div>

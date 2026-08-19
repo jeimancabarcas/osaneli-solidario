@@ -1,6 +1,6 @@
 {
   "name": "OSANELI - Todos Somos Colombia",
-  "description": "Edición limitada de 200 piezas con propósito y movimiento de solidaridad para apoyar a Colombia.",
+  "description": "Edición limitada con propósito: Camiseta y Short solidarios en Cartagena 2026.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -21,7 +21,7 @@ export const Footer: React.FC<FooterProps> = ({
       </div>
 
       <div className="font-mono-tag text-[12px] text-[#c6c6ce] text-center">
-        © 2024 OSANELI - TODOS SOMOS COLOMBIA
+        © 2026 OSANELI - TODOS SOMOS COLOMBIA · CARTAGENA
       </div>
 
       <div className="flex flex-wrap justify-center gap-6 font-mono-tag text-[12px] text-[#c6c6ce]">

@@ -75,7 +75,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
               </div>
               <div className="p-3 bg-[#1a221a] border border-[#46464d] flex items-center gap-2 text-[#c6c6ce]">
                 <MapPin className="w-4 h-4 text-[#e9c349] flex-shrink-0" />
-                <span>Bogotá & Medellín, Colombia</span>
+                <span>Cartagena de Indias, Colombia</span>
               </div>
             </div>
 

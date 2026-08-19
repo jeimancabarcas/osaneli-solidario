@@ -49,10 +49,10 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
           <div className="space-y-3">
             <h3 className="font-mono-tag text-[13px] md:text-[14px] font-bold text-[#e9c349] uppercase tracking-[0.15em] border-b border-[#46464d] pb-2 flex items-center justify-between">
               <span>La Realidad</span>
-              <span className="text-[#c6c6ce] text-[11px] font-normal">EMERGENCIA & ACCIÓN</span>
+              <span className="text-[#c6c6ce] text-[11px] font-normal">EMERGENCIA & ACCIÓN · CARTAGENA 2026</span>
             </h3>
             <p className="text-[15px] md:text-[16px] leading-[24px] text-[#c6c6ce]">
-              Una mirada a la situación actual en Colombia y el esfuerzo incansable de quienes están en primera línea ayudando a nuestras comunidades a salir adelante tras la emergencia.
+              Una mirada a la situación actual en Cartagena y Bolívar, y el esfuerzo incansable de brigadistas y voluntarios que apoyan a nuestras comunidades en primera línea.
             </p>
           </div>
 
@@ -60,11 +60,11 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
             {/* Image 1: Rescue Workers */}
             <div
               className="group relative border border-[#46464d] bg-[#161d16] overflow-hidden cursor-pointer shadow-lg"
-              onClick={() => onOpenImageLightbox(IMAGES.rescueWorkers, 'Cuerpos de rescate y voluntarios en primera línea - Colombia')}
+              onClick={() => onOpenImageLightbox(IMAGES.rescueWorkers, 'Cuerpos de rescate y voluntarios en primera línea - Cartagena 2026')}
             >
               <img
                 src={IMAGES.rescueWorkers}
-                alt="Cuerpos de rescate y brigadistas en zona de emergencia"
+                alt="Cuerpos de rescate y brigadistas en zona de emergencia Cartagena"
                 className="w-full aspect-[16/10] md:aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
@@ -82,7 +82,7 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
             {/* Image 2: Damaged Buildings */}
             <div
               className="group relative border border-[#46464d] bg-[#161d16] overflow-hidden cursor-pointer shadow-lg"
-              onClick={() => onOpenImageLightbox(IMAGES.damagedBuildings, 'Zonas afectadas en proceso de remoción y reconstrucción comunitaria')}
+              onClick={() => onOpenImageLightbox(IMAGES.damagedBuildings, 'Zonas afectadas en proceso de remoción y reconstrucción comunitaria - Cartagena')}
             >
               <img
                 src={IMAGES.damagedBuildings}
@@ -108,10 +108,10 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
           <div className="space-y-3">
             <h3 className="font-mono-tag text-[13px] md:text-[14px] font-bold text-[#e9c349] uppercase tracking-[0.15em] border-b border-[#46464d] pb-2 flex items-center justify-between">
               <span>Nuestra Respuesta / La Colección</span>
-              <span className="text-[#c6c6ce] text-[11px] font-normal">200 PIEZAS ÚNICAS</span>
+              <span className="text-[#c6c6ce] text-[11px] font-normal">2 PIEZAS · 200 UNIDADES</span>
             </h3>
             <p className="text-[15px] md:text-[16px] leading-[24px] text-[#c6c6ce]">
-              Transformamos la solidaridad en arte tangible. A través de estos diseños y prendas exclusivas, canalizamos el apoyo directo para reconstruir y avanzar juntos.
+              Transformamos la solidaridad en arte tangible con dos piezas exclusivas: la camiseta conmemorativa y el short de denim utilitario, canalizando el 100% del apoyo a Cartagena.
             </p>
           </div>
 
@@ -119,11 +119,11 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
             {/* Graphic 1: I Love Colombia 10 Agosto 2026 */}
             <div
               className="group relative border border-[#46464d] bg-[#08100a] overflow-hidden cursor-pointer shadow-lg"
-              onClick={() => onOpenImageLightbox(IMAGES.iloveColombia, 'I Love Colombia - Gráfica Oficial de Solidaridad')}
+              onClick={() => onOpenImageLightbox(IMAGES.iloveColombia, 'I Love Colombia - Gráfica Oficial de Solidaridad · Cartagena 2026')}
             >
               <img
                 src={IMAGES.iloveColombia}
-                alt="Gráfica I Love Colombia 10 Agosto 2026"
+                alt="Gráfica I Love Colombia 10 Agosto 2026 Cartagena"
                 className="w-full h-auto object-contain p-4 transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
@@ -133,7 +133,7 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
                 </span>
               </div>
               <div className="p-3 bg-[#161d16] border-t border-[#46464d] flex justify-between items-center text-[12px] font-mono-tag text-[#c6c6ce]">
-                <span>ARTE OFICIAL / 10 AGOSTO 2026</span>
+                <span>ARTE OFICIAL / 10 AGOSTO 2026 · CARTAGENA</span>
                 <span className="text-[#e9c349]">DISEÑO VECTORIAL</span>
               </div>
             </div>
@@ -141,21 +141,21 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
             {/* Graphic 2: Collection Mockup Grid */}
             <div
               className="group relative border border-[#46464d] bg-[#08100a] overflow-hidden cursor-pointer shadow-lg"
-              onClick={() => onOpenImageLightbox(IMAGES.collectionGrid, 'Muestra completa de la colección solidaria de 200 piezas')}
+              onClick={() => onOpenImageLightbox(IMAGES.collectionGrid, 'Muestra de la colección solidaria: Camiseta y Short de Denim · Cartagena 2026')}
             >
               <img
                 src={IMAGES.collectionGrid}
-                alt="Colección completa de camisetas, cropped tops y bermudas de denim"
+                alt="Colección solidaria: Camiseta y Short de Denim"
                 className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-[#0d150f]/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <span className="font-mono-tag text-[12px] bg-[#0d150f]/90 text-[#e9c349] px-3 py-1.5 border border-[#e9c349] flex items-center gap-1.5">
-                  <ZoomIn className="w-3.5 h-3.5" /> EXPLORAR CATÁLOGO COMPLETO
+                  <ZoomIn className="w-3.5 h-3.5" /> VER DETALLES DE COLECCIÓN
                 </span>
               </div>
               <div className="p-3 bg-[#161d16] border-t border-[#46464d] flex justify-between items-center text-[12px] font-mono-tag text-[#c6c6ce]">
-                <span>EDICIÓN NUMERADA 1 - 200</span>
+                <span>CAMISETA & SHORT · SERIE 1 - 200</span>
                 <span className="text-[#e9c349]">100% FONDOS DE APOYO</span>
               </div>
             </div>
@@ -168,10 +168,10 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-[#46464d] pb-4">
           <div>
             <span className="font-mono-tag text-[11px] uppercase tracking-[0.2em] text-[#e9c349] font-bold">
-              Catálogo Interactivo
+              Las 2 Piezas Oficiales · Cartagena 2026
             </span>
             <h4 className="font-anybody text-[22px] md:text-[26px] text-[#dce5d9] font-bold">
-              Selecciona una pieza con propósito
+              Selecciona tu pieza con propósito
             </h4>
           </div>
           <div className="font-mono-tag text-[12px] text-[#c6c6ce] bg-[#242c24] px-3 py-1.5 border border-[#46464d]">
@@ -179,34 +179,51 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
           </div>
         </div>
 
-        {/* Piece Selector Buttons */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+        {/* 2 Products Showcase Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           {COLLECTION_PIECES.map((piece) => {
             const isSelected = selectedPiece.id === piece.id;
             return (
               <button
                 key={piece.id}
                 onClick={() => setSelectedPiece(piece)}
-                className={`p-3 text-left border transition-all cursor-pointer flex flex-col justify-between h-24 ${
+                className={`p-5 text-left border transition-all cursor-pointer flex flex-col justify-between gap-3 ${
                   isSelected
-                    ? 'border-[#e9c349] bg-[#242c24] text-[#e9c349]'
+                    ? 'border-[#e9c349] bg-[#242c24] text-[#e9c349] ring-1 ring-[#e9c349]'
                     : 'border-[#46464d] bg-[#161d16] text-[#c6c6ce] hover:border-[#c6c6ce]'
                 }`}
               >
-                <div className="flex justify-between items-start">
-                  <span
-                    className="w-3 h-3 border border-white/20 rounded-full"
-                    style={{ backgroundColor: piece.color }}
-                  />
-                  <span className="font-mono-tag text-[9px] uppercase tracking-wider text-[#c6c6ce]/70">
-                    #{piece.editionNumber}
+                <div className="flex justify-between items-start w-full">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-3.5 h-3.5 border border-white/20 rounded-full"
+                      style={{ backgroundColor: piece.color }}
+                    />
+                    <span className="font-mono-tag text-[11px] uppercase font-bold tracking-wider text-[#e9c349]">
+                      {piece.tag}
+                    </span>
+                  </div>
+                  <span className="font-mono-tag text-[11px] uppercase tracking-wider text-[#c6c6ce]">
+                    Edición #{piece.editionNumber} / 200
                   </span>
                 </div>
-                <div className="font-mono-tag text-[11px] font-bold uppercase truncate">
-                  {piece.tag}
+
+                <div>
+                  <h5 className="font-anybody text-[16px] md:text-[18px] font-bold text-[#dce5d9] leading-snug">
+                    {piece.name}
+                  </h5>
+                  <p className="text-[13px] text-[#c6c6ce] line-clamp-2 mt-1">
+                    {piece.description}
+                  </p>
                 </div>
-                <div className="font-mono-tag text-[11px] text-[#dce5d9]">
-                  ${piece.priceUSD} USD
+
+                <div className="flex justify-between items-center pt-2 border-t border-[#46464d]/60 w-full">
+                  <span className="font-mono-tag text-[14px] font-bold text-[#e9c349]">
+                    ${piece.priceUSD} USD <span className="text-[11px] text-[#c6c6ce] font-normal">(≈ ${piece.priceCOP.toLocaleString()} COP)</span>
+                  </span>
+                  <span className="font-mono-tag text-[11px] text-[#dce5d9] bg-[#161d16] px-2.5 py-1 border border-[#46464d]">
+                    {isSelected ? '✓ SELECCIONADO' : 'SELECCIONAR'}
+                  </span>
                 </div>
               </button>
             );
@@ -218,7 +235,7 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-3">
               <span className="font-mono-tag text-[10px] bg-[#e9c349] text-[#241a00] font-bold px-2 py-0.5 uppercase">
-                Edición #{selectedPiece.editionNumber} de {selectedPiece.totalEdition}
+                Edición #{selectedPiece.editionNumber} de {selectedPiece.totalEdition} · Cartagena 2026
               </span>
               <span className="font-mono-tag text-[12px] text-[#c6c6ce]">
                 Tono: {selectedPiece.colorName}
@@ -230,6 +247,13 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
             <p className="text-[14px] text-[#c6c6ce] leading-relaxed">
               {selectedPiece.description}
             </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {selectedPiece.features.map((feat, idx) => (
+                <span key={idx} className="font-mono-tag text-[11px] text-[#c6c6ce] bg-[#1a221a] px-2 py-0.5 border border-[#46464d]">
+                  • {feat}
+                </span>
+              ))}
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">

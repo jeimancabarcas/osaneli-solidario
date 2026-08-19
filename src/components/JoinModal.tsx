@@ -223,7 +223,7 @@ export const JoinModal: React.FC<JoinModalProps> = ({
                 </label>
                 <input
                   type="text"
-                  placeholder="Ej. Fuerza Colombia, juntos salimos adelante."
+                  placeholder="Ej. Fuerza Cartagena, juntos salimos adelante."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   maxLength={100}

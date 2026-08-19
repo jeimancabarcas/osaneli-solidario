@@ -31,7 +31,7 @@ export const ImpactReportModal: React.FC<ImpactReportModalProps> = ({
               Trazabilidad en Tiempo Real
             </span>
             <h3 className="font-anybody text-[26px] font-bold text-[#dce5d9] uppercase tracking-tight mt-1">
-              Impact Report · Todos Somos Colombia
+              Impact Report · Cartagena 2026
             </h3>
             <p className="text-[14px] text-[#c6c6ce] mt-1">
               Actualización del destino de los fondos recaudados a través de las 200 piezas.
