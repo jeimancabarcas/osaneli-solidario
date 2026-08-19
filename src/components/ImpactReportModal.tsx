@@ -5,12 +5,14 @@ interface ImpactReportModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentCount: number;
+  totalCount?: number;
 }
 
 export const ImpactReportModal: React.FC<ImpactReportModalProps> = ({
   isOpen,
   onClose,
   currentCount,
+  totalCount = 200,
 }) => {
   if (!isOpen) return null;
 
@@ -34,7 +36,7 @@ export const ImpactReportModal: React.FC<ImpactReportModalProps> = ({
               Impact Report · Cartagena 2026
             </h3>
             <p className="text-[14px] text-[#c6c6ce] mt-1">
-              Actualización del destino de los fondos recaudados a través de las 200 piezas.
+              Actualización del destino de los fondos recaudados a través de las {totalCount} piezas.
             </p>
           </div>
 
@@ -42,7 +44,7 @@ export const ImpactReportModal: React.FC<ImpactReportModalProps> = ({
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div className="p-3.5 bg-[#1a221a] border border-[#46464d]">
               <span className="font-mono-tag text-[10px] text-[#c6c6ce] uppercase">Piezas Alcanzadas</span>
-              <p className="font-anybody text-[24px] font-bold text-[#e9c349]">{currentCount} / 200</p>
+              <p className="font-anybody text-[24px] font-bold text-[#e9c349]">{currentCount} / {totalCount}</p>
             </div>
             <div className="p-3.5 bg-[#1a221a] border border-[#46464d]">
               <span className="font-mono-tag text-[10px] text-[#c6c6ce] uppercase">Familias Asistidas</span>

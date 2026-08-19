@@ -193,6 +193,9 @@ export default function App() {
 
         {/* The Context / Purpose Section with Reality Photos & Collection Gallery */}
         <ContextSection
+          currentCount={currentCount}
+          totalCount={totalCount}
+          isLoadingCampaign={isLoadingCampaign}
           onOpenImageLightbox={openLightbox}
           onAddToCart={handleAddToCart}
           onSelectPieceForJoin={(piece) => {
@@ -255,6 +258,7 @@ export default function App() {
         isOpen={isReportOpen}
         onClose={() => setIsReportOpen(false)}
         currentCount={currentCount ?? 0}
+        totalCount={totalCount}
       />
 
       <ContactModal

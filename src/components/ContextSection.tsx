@@ -4,12 +4,18 @@ import { IMAGES, COLLECTION_PIECES } from '../data/mockData';
 import { CollectionPiece } from '../types';
 
 interface ContextSectionProps {
+  currentCount: number | null;
+  totalCount: number;
+  isLoadingCampaign?: boolean;
   onOpenImageLightbox: (url: string, title: string) => void;
   onAddToCart: (piece: CollectionPiece, size: string) => void;
   onSelectPieceForJoin: (piece: CollectionPiece) => void;
 }
 
 export const ContextSection: React.FC<ContextSectionProps> = ({
+  currentCount,
+  totalCount,
+  isLoadingCampaign = false,
   onOpenImageLightbox,
   onAddToCart,
   onSelectPieceForJoin,
@@ -17,6 +23,11 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
   const [selectedPiece, setSelectedPiece] = useState<CollectionPiece>(COLLECTION_PIECES[0]);
   const [selectedSize, setSelectedSize] = useState<string>('L');
   const [addedAnimation, setAddedAnimation] = useState(false);
+
+  const isCountLoading = isLoadingCampaign || currentCount === null;
+  const safeCount = currentCount ?? 0;
+  const availablePieces = Math.max(0, totalCount - safeCount);
+  const currentEditionNumber = Math.min(totalCount, safeCount + 1);
 
   const handleQuickAdd = (piece: CollectionPiece) => {
     onAddToCart(piece, selectedSize);
@@ -108,7 +119,7 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
           <div className="space-y-3">
             <h3 className="font-mono-tag text-[13px] md:text-[14px] font-bold text-[#e9c349] uppercase tracking-[0.15em] border-b border-[#46464d] pb-2 flex items-center justify-between">
               <span>Nuestra Respuesta / La Colección</span>
-              <span className="text-[#c6c6ce] text-[11px] font-normal">2 PIEZAS · 200 UNIDADES</span>
+              <span className="text-[#c6c6ce] text-[11px] font-normal">2 PIEZAS · {totalCount} UNIDADES</span>
             </h3>
             <p className="text-[15px] md:text-[16px] leading-[24px] text-[#c6c6ce]">
               Transformamos la solidaridad en arte tangible con dos piezas exclusivas: la camiseta conmemorativa y el short de denim utilitario para Cartagena 2026.
@@ -155,7 +166,7 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
                 </span>
               </div>
               <div className="p-3 bg-[#161d16] border-t border-[#46464d] flex justify-between items-center text-[12px] font-mono-tag text-[#c6c6ce]">
-                <span>CAMISETA & SHORT · SERIE 1 - 200</span>
+                <span>CAMISETA & SHORT · SERIE 1 - {totalCount}</span>
                 <span className="text-[#e9c349]">EDICIÓN LIMITADA</span>
               </div>
             </div>
@@ -174,8 +185,16 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
               Selecciona tu pieza con propósito
             </h4>
           </div>
-          <div className="font-mono-tag text-[12px] text-[#c6c6ce] bg-[#242c24] px-3 py-1.5 border border-[#46464d]">
-            PIEZAS DISPONIBLES: <span className="text-[#e9c349] font-bold">58 / 200</span>
+
+          <div className="font-mono-tag text-[12px] text-[#c6c6ce] bg-[#242c24] px-3 py-1.5 border border-[#46464d] flex items-center gap-2">
+            <span>PIEZAS DISPONIBLES:</span>
+            {isCountLoading ? (
+              <span className="inline-block h-4 w-14 bg-[#2f372f] animate-pulse rounded-xs" />
+            ) : (
+              <span className="text-[#e9c349] font-bold animate-fade-in">
+                {availablePieces} / {totalCount}
+              </span>
+            )}
           </div>
         </div>
 
@@ -204,7 +223,11 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
                     </span>
                   </div>
                   <span className="font-mono-tag text-[11px] uppercase tracking-wider text-[#c6c6ce]">
-                    Edición #{piece.editionNumber} / 200
+                    {isCountLoading ? (
+                      `Edición Limitada / ${totalCount}`
+                    ) : (
+                      `Edición #${currentEditionNumber} / ${totalCount}`
+                    )}
                   </span>
                 </div>
 
@@ -235,7 +258,11 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-3">
               <span className="font-mono-tag text-[10px] bg-[#e9c349] text-[#241a00] font-bold px-2 py-0.5 uppercase">
-                Edición #{selectedPiece.editionNumber} de {selectedPiece.totalEdition} · Cartagena 2026
+                {isCountLoading ? (
+                  `Edición de ${totalCount} · Cartagena 2026`
+                ) : (
+                  `Edición #${currentEditionNumber} de ${totalCount} · Cartagena 2026`
+                )}
               </span>
               <span className="font-mono-tag text-[12px] text-[#c6c6ce]">
                 Tono: {selectedPiece.colorName}
