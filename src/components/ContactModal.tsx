@@ -68,14 +68,22 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px] font-mono-tag">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[12px] font-mono-tag">
               <div className="p-3 bg-[#1a221a] border border-[#46464d] flex items-center gap-2 text-[#c6c6ce]">
                 <Mail className="w-4 h-4 text-[#e9c349] flex-shrink-0" />
                 <span className="truncate">solidaridad@osaneli.co</span>
               </div>
+              <a
+                href="https://wa.me/573236737646?text=Hola%20OSANELI,%20deseo%20comunicarme%20con%20ustedes."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-[#1a221a] border border-[#46464d] hover:border-[#25D366] flex items-center gap-2 text-[#25D366] transition-colors"
+              >
+                <span className="font-bold">+57 323 6737646</span>
+              </a>
               <div className="p-3 bg-[#1a221a] border border-[#46464d] flex items-center gap-2 text-[#c6c6ce]">
                 <MapPin className="w-4 h-4 text-[#e9c349] flex-shrink-0" />
-                <span>Cartagena de Indias, Colombia</span>
+                <span>Cartagena, Colombia</span>
               </div>
             </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, ShoppingBag, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { X, Trash2, ShoppingBag, MessageCircle, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { CartItem } from '../types';
 
 interface CartDrawerProps {
@@ -22,19 +22,50 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onCheckoutSuccess,
 }) => {
   const [buyerName, setBuyerName] = useState('');
-  const [buyerEmail, setBuyerEmail] = useState('');
+  const [buyerCity, setBuyerCity] = useState('Cartagena');
+  const [orderNotes, setOrderNotes] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [whatsappUrl, setWhatsappUrl] = useState('');
 
   if (!isOpen) return null;
 
   const subtotalUSD = items.reduce((acc, item) => acc + item.piece.priceUSD * item.quantity, 0);
   const subtotalCOP = items.reduce((acc, item) => acc + item.piece.priceCOP * item.quantity, 0);
+  const WHATSAPP_NUMBER = '573236737646';
 
   const handleCheckout = (e: React.FormEvent) => {
     e.preventDefault();
     const finalName = buyerName.trim() || 'Comprador Solidario';
-    onCheckoutSuccess(finalName, `Apoyo con ${items.length} piezas solidarias.`);
+    
+    // Construct items bullet points
+    const itemsList = items
+      .map(
+        (item, idx) =>
+          `${idx + 1}. *${item.piece.name}* (Talla ${item.size}) x ${item.quantity} - $${item.piece.priceUSD * item.quantity} USD (≈ $${(item.piece.priceCOP * item.quantity).toLocaleString()} COP)`
+      )
+      .join('\n');
+
+    const messageText =
+      `¡Hola OSANELI! Deseo confirmar mi pedido solidario para Cartagena 2026:\n\n` +
+      `• *Comprador:* ${finalName}\n` +
+      `• *Ciudad / Dirección:* ${buyerCity || 'Cartagena'}\n` +
+      (orderNotes ? `• *Notas:* ${orderNotes}\n\n` : '\n') +
+      `*Resumen del Pedido:*\n` +
+      `${itemsList}\n\n` +
+      `*Total a Pagar:* $${subtotalUSD} USD (≈ $${subtotalCOP.toLocaleString()} COP)\n\n` +
+      `Quedo atento a las instrucciones para efectuar el pago y la entrega. ¡Gracias!`;
+
+    const generatedUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(messageText)}`;
+    setWhatsappUrl(generatedUrl);
+
+    onCheckoutSuccess(finalName, `Adquirió ${items.length} piezas solidarias para Cartagena.`);
     setIsSuccess(true);
+
+    try {
+      window.open(generatedUrl, '_blank');
+    } catch {
+      // Handled by UI button
+    }
   };
 
   const handleFinish = () => {
@@ -67,28 +98,45 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
         </div>
 
         {isSuccess ? (
-          <div className="flex-1 flex flex-col justify-center items-center text-center py-10 space-y-5">
-            <div className="w-16 h-16 rounded-full bg-[#e9c349]/10 border border-[#e9c349] text-[#e9c349] flex items-center justify-center">
+          <div className="flex-1 flex flex-col justify-center items-center text-center py-8 space-y-5">
+            <div className="w-16 h-16 rounded-full bg-[#25D366]/10 border border-[#25D366] text-[#25D366] flex items-center justify-center">
               <CheckCircle2 className="w-10 h-10" />
             </div>
-            <h4 className="font-anybody text-[24px] font-bold text-[#dce5d9] uppercase">
-              ¡Orden Confirmada!
-            </h4>
-            <p className="text-[14px] text-[#c6c6ce] leading-relaxed">
-              Gracias por unirte a OSANELI. Hemos registrado tu pedido y el 100% de las ganancias están comprometidas a las brigadas de auxilio en Colombia.
-            </p>
-            <div className="p-4 bg-[#1a221a] border border-[#46464d] text-left text-[12px] font-mono-tag w-full space-y-1">
-              <p className="text-[#e9c349] font-bold">DETALLE DE ORDEN</p>
-              <p className="text-[#c6c6ce]">Beneficiario: <span className="text-[#dce5d9]">{buyerName || 'Comprador Solidario'}</span></p>
-              <p className="text-[#c6c6ce]">Email: <span className="text-[#dce5d9]">{buyerEmail || 'contacto@solidaridad.co'}</span></p>
-              <p className="text-[#c6c6ce]">Monto Total: <span className="text-[#e9c349] font-bold">${subtotalUSD} USD</span></p>
+            <div className="space-y-1">
+              <h4 className="font-anybody text-[24px] font-bold text-[#dce5d9] uppercase">
+                ¡Pedido Generado!
+              </h4>
+              <p className="text-[13px] text-[#c6c6ce] leading-relaxed">
+                Tu pedido se canaliza directamente por WhatsApp al <strong className="text-[#e9c349]">+57 323 6737646</strong> para coordinar pago y entrega.
+              </p>
             </div>
-            <button
-              onClick={handleFinish}
-              className="w-full py-3.5 bg-[#e9c349] text-[#241a00] font-mono-tag font-bold uppercase text-[12px] tracking-wider hover:bg-[#ffe088] transition-colors cursor-pointer"
-            >
-              Completar y Cerrar
-            </button>
+
+            <div className="p-4 bg-[#1a221a] border border-[#46464d] text-left text-[12px] font-mono-tag w-full space-y-1">
+              <p className="text-[#e9c349] font-bold">DETALLE DE COMPRA</p>
+              <p className="text-[#c6c6ce]">Comprador: <span className="text-[#dce5d9]">{buyerName || 'Comprador Solidario'}</span></p>
+              <p className="text-[#c6c6ce]">Destino: <span className="text-[#dce5d9]">{buyerCity || 'Cartagena'}</span></p>
+              <p className="text-[#c6c6ce]">Total: <span className="text-[#e9c349] font-bold">${subtotalUSD} USD (≈ ${subtotalCOP.toLocaleString()} COP)</span></p>
+              <p className="text-[#c6c6ce]">WhatsApp: <span className="text-[#25D366] font-bold">+57 323 6737646</span></p>
+            </div>
+
+            <div className="w-full space-y-3">
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-4 bg-[#25D366] text-[#0a1a0f] font-mono-tag font-bold uppercase text-[13px] tracking-wider hover:bg-[#20bd5a] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+              >
+                <MessageCircle className="w-5 h-5 fill-current" />
+                <span>Enviar Pedido a WhatsApp (+57 323 6737646)</span>
+              </a>
+
+              <button
+                onClick={handleFinish}
+                className="w-full py-3 bg-[#1a221a] border border-[#46464d] text-[#c6c6ce] hover:text-[#dce5d9] hover:border-[#e9c349] font-mono-tag font-bold uppercase text-[12px] tracking-wider transition-colors cursor-pointer"
+              >
+                Finalizar y Vaciar Bolsa
+              </button>
+            </div>
           </div>
         ) : (
           <>
@@ -99,7 +147,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <ShoppingBag className="w-12 h-12 text-[#46464d]" />
                   <p className="font-mono-tag text-[13px] text-[#c6c6ce]">Tu bolsa está vacía.</p>
                   <p className="text-[13px] text-[#c6c6ce]/70 max-w-xs">
-                    Elige una de las 200 piezas seriadas para apoyar la iniciativa.
+                    Elige la Camiseta o el Short de la colección Cartagena 2026 para iniciar tu orden.
                   </p>
                 </div>
               ) : (
@@ -133,7 +181,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       <div className="flex items-center border border-[#46464d] bg-[#161d16]">
                         <button
                           onClick={() => onUpdateQuantity(item.piece.id, item.size, -1)}
-                          className="px-2 py-1 text-[13px] hover:text-[#e9c349] font-mono-tag"
+                          className="px-2.5 py-1 text-[13px] hover:text-[#e9c349] font-mono-tag"
                         >
                           -
                         </button>
@@ -142,7 +190,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         </span>
                         <button
                           onClick={() => onUpdateQuantity(item.piece.id, item.size, 1)}
-                          className="px-2 py-1 text-[13px] hover:text-[#e9c349] font-mono-tag"
+                          className="px-2.5 py-1 text-[13px] hover:text-[#e9c349] font-mono-tag"
                         >
                           +
                         </button>
@@ -171,45 +219,69 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     <span className="text-[#dce5d9] font-bold">${subtotalUSD} USD</span>
                   </div>
                   <div className="flex justify-between text-[#c6c6ce]">
-                    <span>Fondo de Solidaridad</span>
-                    <span className="text-[#e9c349] font-bold">100% INCLUIDO</span>
+                    <span>En pesos (COP)</span>
+                    <span className="text-[#dce5d9] font-bold">${subtotalCOP.toLocaleString()} COP</span>
                   </div>
                   <div className="flex justify-between text-[16px] font-bold pt-2 border-t border-[#46464d] text-[#dce5d9]">
-                    <span>Total a Contribuir</span>
+                    <span>Total Pedido</span>
                     <span className="text-[#e9c349]">${subtotalUSD} USD</span>
                   </div>
                 </div>
 
                 {/* Checkout Quick Fields */}
                 <form onSubmit={handleCheckout} className="space-y-3">
-                  <input
-                    type="text"
-                    required
-                    placeholder="Tu nombre completo"
-                    value={buyerName}
-                    onChange={(e) => setBuyerName(e.target.value)}
-                    className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none"
-                  />
-                  <input
-                    type="email"
-                    required
-                    placeholder="Correo electrónico para certificado"
-                    value={buyerEmail}
-                    onChange={(e) => setBuyerEmail(e.target.value)}
-                    className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none"
-                  />
+                  <div>
+                    <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase block mb-1">
+                      Nombre Completo
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Tu nombre completo"
+                      value={buyerName}
+                      onChange={(e) => setBuyerName(e.target.value)}
+                      className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase block mb-1">
+                      Ciudad / Dirección de Entrega
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ej. Cartagena, Bocagrande"
+                      value={buyerCity}
+                      onChange={(e) => setBuyerCity(e.target.value)}
+                      className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase block mb-1">
+                      Notas o Instrucciones (Opcional)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Ej. Horario de entrega o referencia"
+                      value={orderNotes}
+                      onChange={(e) => setOrderNotes(e.target.value)}
+                      className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-2.5 text-[13px] focus:border-[#e9c349] focus:outline-none"
+                    />
+                  </div>
 
                   <div className="p-2.5 bg-[#1a221a] border border-[#46464d] flex items-center gap-2 text-[11px] text-[#c6c6ce]">
                     <ShieldCheck className="w-4 h-4 text-[#e9c349] flex-shrink-0" />
-                    <span>Envío internacional garantizado y trazabilidad de fondos.</span>
+                    <span>Finalización por WhatsApp oficial: +57 323 6737646.</span>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full py-3.5 bg-[#e9c349] text-[#241a00] font-mono-tag font-bold text-[13px] uppercase tracking-wider hover:bg-[#ffe088] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                    className="w-full py-3.5 bg-[#25D366] text-[#0a1a0f] font-mono-tag font-bold text-[13px] uppercase tracking-wider hover:bg-[#20bd5a] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
                   >
-                    <span>Proceder al Pago Solidario</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <MessageCircle className="w-5 h-5 fill-current" />
+                    <span>Finalizar Pedido por WhatsApp</span>
                   </button>
                 </form>
               </div>

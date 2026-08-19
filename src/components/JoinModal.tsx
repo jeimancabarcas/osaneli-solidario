@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Heart, ShieldCheck, CheckCircle2, ArrowRight } from 'lucide-react';
+import { X, Heart, ShieldCheck, CheckCircle2, MessageCircle, ArrowRight } from 'lucide-react';
 import { COLLECTION_PIECES } from '../data/mockData';
 import { CollectionPiece } from '../types';
 
@@ -21,25 +21,43 @@ export const JoinModal: React.FC<JoinModalProps> = ({
   );
   const [size, setSize] = useState<string>('L');
   const [donorName, setDonorName] = useState<string>('');
+  const [phoneCity, setPhoneCity] = useState<string>('Cartagena');
   const [message, setMessage] = useState<string>('');
-  const [customAmount, setCustomAmount] = useState<number>(48);
-  const [actionType, setActionType] = useState<'piece' | 'donation'>('piece');
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [whatsappUrl, setWhatsappUrl] = useState<string>('');
 
   if (!isOpen) return null;
 
   const currentPiece = COLLECTION_PIECES.find((p) => p.id === selectedPieceId) || COLLECTION_PIECES[0];
+  const WHATSAPP_NUMBER = '573236737646';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const finalName = donorName.trim() || 'Solidario Anónimo';
-    const finalMessage = message.trim() || 'Unidos por Colombia.';
-    const itemSupported = actionType === 'piece' 
-      ? `${currentPiece.name} (Talla ${size})` 
-      : `Donación Directa ($${customAmount} USD)`;
+    const finalMessage = message.trim() || 'Unidos por Cartagena.';
+    const itemSupported = `${currentPiece.name} (Talla ${size})`;
+
+    const textToSend = `¡Hola OSANELI! Deseo adquirir una pieza de la colección solidaria Cartagena 2026:\n\n` +
+      `• *Pieza:* ${currentPiece.name}\n` +
+      `• *Talla:* ${size}\n` +
+      `• *Precio:* $${currentPiece.priceUSD} USD (≈ $${currentPiece.priceCOP.toLocaleString()} COP)\n` +
+      `• *Nombre del comprador:* ${finalName}\n` +
+      `• *Ciudad/Ubicación:* ${phoneCity || 'Cartagena'}\n` +
+      (finalMessage ? `• *Mensaje de apoyo:* "${finalMessage}"\n\n` : '\n') +
+      `Deseo coordinar el pago y recibir mi pieza seriada. ¡Gracias!`;
+
+    const generatedUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(textToSend)}`;
+    setWhatsappUrl(generatedUrl);
 
     onJoinSuccess(finalName, finalMessage, itemSupported);
     setIsSuccess(true);
+
+    // Open WhatsApp in a safe window
+    try {
+      window.open(generatedUrl, '_blank');
+    } catch {
+      // Fallback handled by UI button
+    }
   };
 
   const handleDone = () => {
@@ -62,156 +80,147 @@ export const JoinModal: React.FC<JoinModalProps> = ({
         </button>
 
         {isSuccess ? (
-          <div className="text-center py-8 space-y-6 animate-scale-up">
-            <div className="w-16 h-16 bg-[#e9c349]/10 border border-[#e9c349] text-[#e9c349] rounded-full mx-auto flex items-center justify-center">
+          <div className="text-center py-6 space-y-6 animate-scale-up">
+            <div className="w-16 h-16 bg-[#25D366]/10 border border-[#25D366] text-[#25D366] rounded-full mx-auto flex items-center justify-center">
               <CheckCircle2 className="w-10 h-10" />
             </div>
             <div className="space-y-2">
               <span className="font-mono-tag text-[11px] text-[#e9c349] uppercase tracking-widest font-bold">
-                Impacto Registrado
+                Pedido Registrado · Cartagena 2026
               </span>
-              <h3 className="font-anybody text-[28px] font-bold text-[#dce5d9] uppercase">
+              <h3 className="font-anybody text-[26px] md:text-[28px] font-bold text-[#dce5d9] uppercase">
                 ¡Gracias por tu Solidaridad!
               </h3>
-              <p className="text-[15px] text-[#c6c6ce] max-w-md mx-auto">
-                Tu aporte ha sido sumado al conteo en vivo de 200 piezas y aparecerá en el registro del movimiento. El 100% de los fondos están siendo canalizados a las brigadas de emergencia.
+              <p className="text-[14px] text-[#c6c6ce] max-w-md mx-auto">
+                Tu pedido se finaliza a través de nuestro canal oficial de WhatsApp al número <strong className="text-[#e9c349]">+57 323 6737646</strong>.
               </p>
             </div>
 
             <div className="p-4 bg-[#1a221a] border border-[#46464d] text-left text-[13px] font-mono-tag space-y-1">
-              <p className="text-[#e9c349] font-bold">COMPROBANTE DE COMPROMISO SOLIDARIO</p>
-              <p className="text-[#c6c6ce]">Donante: <span className="text-[#dce5d9]">{donorName || 'Solidario Anónimo'}</span></p>
-              <p className="text-[#c6c6ce]">Mensaje: <span className="text-[#dce5d9] italic">"{message || 'Unidos por Colombia.'}"</span></p>
-              <p className="text-[#c6c6ce]">Fecha: <span className="text-[#dce5d9]">{new Date().toLocaleDateString('es-CO')}</span></p>
+              <p className="text-[#e9c349] font-bold">RESUMEN DE ADQUISICIÓN</p>
+              <p className="text-[#c6c6ce]">Prenda: <span className="text-[#dce5d9] font-bold">{currentPiece.name} (Talla {size})</span></p>
+              <p className="text-[#c6c6ce]">Valor: <span className="text-[#e9c349] font-bold">${currentPiece.priceUSD} USD (≈ ${currentPiece.priceCOP.toLocaleString()} COP)</span></p>
+              <p className="text-[#c6c6ce]">Comprador: <span className="text-[#dce5d9]">{donorName || 'Solidario Anónimo'}</span></p>
+              <p className="text-[#c6c6ce]">WhatsApp Oficial: <span className="text-[#25D366] font-bold">+57 323 6737646</span></p>
             </div>
 
-            <button
-              onClick={handleDone}
-              className="w-full py-3.5 bg-[#e9c349] text-[#241a00] font-mono-tag font-bold uppercase text-[13px] tracking-wider hover:bg-[#ffe088] transition-colors cursor-pointer"
-            >
-              Volver al sitio
-            </button>
+            <div className="space-y-3">
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-4 bg-[#25D366] text-[#0a1a0f] font-mono-tag font-bold uppercase text-[13px] tracking-wider hover:bg-[#20bd5a] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+              >
+                <MessageCircle className="w-5 h-5 fill-current" />
+                <span>Abrir Chat de WhatsApp (+57 323 6737646)</span>
+              </a>
+
+              <button
+                onClick={handleDone}
+                className="w-full py-3 bg-[#1a221a] border border-[#46464d] text-[#c6c6ce] hover:text-[#dce5d9] hover:border-[#e9c349] font-mono-tag text-[12px] uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Volver al sitio
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-6">
             <div className="space-y-1 border-b border-[#46464d] pb-4">
               <span className="font-mono-tag text-[11px] text-[#e9c349] uppercase tracking-[0.2em] font-bold flex items-center gap-1.5">
-                <Heart className="w-3.5 h-3.5 fill-[#e9c349]" /> 100% Destinado a la Causa
+                <Heart className="w-3.5 h-3.5 fill-[#e9c349]" /> 100% Destinado a la Causa · Cartagena 2026
               </span>
               <h3 className="font-anybody text-[24px] md:text-[28px] font-bold text-[#dce5d9] uppercase tracking-tight">
-                Únete y Sé Parte del Cambio
+                Adquirir Pieza Solidaria
               </h3>
               <p className="text-[14px] text-[#c6c6ce]">
-                Adquiere una de las 200 piezas seriadas o realiza una contribución directa a las brigadas de rescate.
+                Elige tu prenda seriada de la colección (Camiseta o Short). El pedido se confirma directamente vía WhatsApp al <span className="text-[#e9c349] font-bold">+57 323 6737646</span>.
               </p>
             </div>
 
-            {/* Type Switcher */}
-            <div className="grid grid-cols-2 gap-2 border border-[#46464d] p-1 bg-[#1a221a]">
-              <button
-                type="button"
-                onClick={() => setActionType('piece')}
-                className={`py-2 text-[12px] font-mono-tag font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                  actionType === 'piece'
-                    ? 'bg-[#e9c349] text-[#241a00]'
-                    : 'text-[#c6c6ce] hover:text-[#dce5d9]'
-                }`}
-              >
-                Adquirir Pieza Seriada
-              </button>
-              <button
-                type="button"
-                onClick={() => setActionType('donation')}
-                className={`py-2 text-[12px] font-mono-tag font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                  actionType === 'donation'
-                    ? 'bg-[#e9c349] text-[#241a00]'
-                    : 'text-[#c6c6ce] hover:text-[#dce5d9]'
-                }`}
-              >
-                Aporte Directo
-              </button>
-            </div>
-
             <form onSubmit={handleSubmit} className="space-y-5">
-              {actionType === 'piece' ? (
-                <>
-                  {/* Piece Selection */}
-                  <div className="space-y-2">
-                    <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
-                      Selecciona tu pieza (#{currentPiece.editionNumber} de 200)
-                    </label>
-                    <select
-                      value={selectedPieceId}
-                      onChange={(e) => setSelectedPieceId(e.target.value)}
-                      className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] font-mono-tag text-[13px] p-3 focus:border-[#e9c349] focus:outline-none"
-                    >
-                      {COLLECTION_PIECES.map((piece) => (
-                        <option key={piece.id} value={piece.id} className="bg-[#161d16] text-[#dce5d9]">
-                          {piece.tag} - {piece.name} (${piece.priceUSD} USD / ${piece.priceCOP.toLocaleString()} COP)
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Size Selection */}
-                  <div className="space-y-2">
-                    <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
-                      Talla
-                    </label>
-                    <div className="grid grid-cols-4 gap-2">
-                      {['S', 'M', 'L', 'XL'].map((s) => (
-                        <button
-                          key={s}
-                          type="button"
-                          onClick={() => setSize(s)}
-                          className={`py-2.5 font-mono-tag text-[13px] font-bold border transition-colors cursor-pointer ${
-                            size === s
-                              ? 'border-[#e9c349] bg-[#e9c349] text-[#241a00]'
-                              : 'border-[#46464d] bg-[#1a221a] text-[#dce5d9] hover:border-[#c6c6ce]'
-                          }`}
-                        >
-                          {s}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                /* Direct Donation amounts */
-                <div className="space-y-2">
-                  <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
-                    Monto de solidaridad (USD)
-                  </label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {[15, 30, 50, 100].map((amt) => (
-                      <button
-                        key={amt}
-                        type="button"
-                        onClick={() => setCustomAmount(amt)}
-                        className={`py-2.5 font-mono-tag text-[13px] font-bold border transition-colors cursor-pointer ${
-                          customAmount === amt
-                            ? 'border-[#e9c349] bg-[#e9c349] text-[#241a00]'
-                            : 'border-[#46464d] bg-[#1a221a] text-[#dce5d9] hover:border-[#c6c6ce]'
-                        }`}
-                      >
-                        ${amt}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Donor Name */}
+              {/* Piece Selection */}
               <div className="space-y-2">
                 <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
-                  Tu Nombre (Aparecerá en el feed en vivo)
+                  Selecciona tu prenda
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {COLLECTION_PIECES.map((piece) => {
+                    const isSelected = selectedPieceId === piece.id;
+                    return (
+                      <button
+                        key={piece.id}
+                        type="button"
+                        onClick={() => setSelectedPieceId(piece.id)}
+                        className={`p-3.5 text-left border transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                          isSelected
+                            ? 'border-[#e9c349] bg-[#242c24] text-[#e9c349]'
+                            : 'border-[#46464d] bg-[#1a221a] text-[#c6c6ce] hover:border-[#c6c6ce]'
+                        }`}
+                      >
+                        <span className="font-mono-tag text-[10px] uppercase font-bold text-[#e9c349]">
+                          {piece.tag}
+                        </span>
+                        <span className="font-anybody text-[14px] font-bold text-[#dce5d9] leading-tight">
+                          {piece.name}
+                        </span>
+                        <span className="font-mono-tag text-[12px] text-[#e9c349] font-bold">
+                          ${piece.priceUSD} USD (≈ ${piece.priceCOP.toLocaleString()} COP)
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Size Selection */}
+              <div className="space-y-2">
+                <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
+                  Talla
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {['S', 'M', 'L', 'XL'].map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setSize(s)}
+                      className={`py-2.5 font-mono-tag text-[13px] font-bold border transition-colors cursor-pointer ${
+                        size === s
+                          ? 'border-[#e9c349] bg-[#e9c349] text-[#241a00]'
+                          : 'border-[#46464d] bg-[#1a221a] text-[#dce5d9] hover:border-[#c6c6ce]'
+                      }`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Buyer Name */}
+              <div className="space-y-2">
+                <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
+                  Tu Nombre Completo
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Ej. Mateo Gómez o Anónimo"
+                  placeholder="Ej. Mateo Gómez"
                   value={donorName}
                   onChange={(e) => setDonorName(e.target.value)}
+                  className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-3 text-[14px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
+                />
+              </div>
+
+              {/* City / Location */}
+              <div className="space-y-2">
+                <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
+                  Ciudad o Barrio de Entrega
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ej. Cartagena (Bocagrande, Manga, Centro...)"
+                  value={phoneCity}
+                  onChange={(e) => setPhoneCity(e.target.value)}
                   className="w-full bg-[#1a221a] border border-[#46464d] text-[#dce5d9] p-3 text-[14px] focus:border-[#e9c349] focus:outline-none placeholder-[#46464d]"
                 />
               </div>
@@ -219,11 +228,11 @@ export const JoinModal: React.FC<JoinModalProps> = ({
               {/* Message of Solidarity */}
               <div className="space-y-2">
                 <label className="font-mono-tag text-[11px] text-[#c6c6ce] uppercase tracking-wider block">
-                  Mensaje de Apoyo (Opcional)
+                  Mensaje de Solidaridad (Opcional)
                 </label>
                 <input
                   type="text"
-                  placeholder="Ej. Fuerza Cartagena, juntos salimos adelante."
+                  placeholder="Ej. Fuerza Cartagena, unidos salimos adelante."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   maxLength={100}
@@ -233,14 +242,15 @@ export const JoinModal: React.FC<JoinModalProps> = ({
 
               <div className="p-3 bg-[#1a221a] border border-[#46464d] flex items-center gap-2.5 text-[12px] text-[#c6c6ce]">
                 <ShieldCheck className="w-4 h-4 text-[#e9c349] flex-shrink-0" />
-                <span>Garantía de transparencia: reporte de auditoría público por OSANELI.</span>
+                <span>Finalización segura mediante WhatsApp directo (+57 323 6737646).</span>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-4 bg-[#e9c349] text-[#241a00] font-mono-tag font-bold text-[13px] uppercase tracking-wider hover:bg-[#ffe088] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                className="w-full py-4 bg-[#25D366] text-[#0a1a0f] font-mono-tag font-bold text-[13px] uppercase tracking-wider hover:bg-[#20bd5a] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
               >
-                <span>Confirmar y Unirme al Movimiento</span>
+                <MessageCircle className="w-5 h-5 fill-current" />
+                <span>Confirmar Pedido por WhatsApp</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>

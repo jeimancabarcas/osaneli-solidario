@@ -39,7 +39,7 @@ export const SolidarityPolicyModal: React.FC<PolicyModalProps> = ({ isOpen, onCl
                 <ShieldCheck className="w-4 h-4" /> 1. Destino del 100% de los Fondos Netos
               </h4>
               <p>
-                La totalidad de los ingresos obtenidos mediante la venta de las 200 piezas seriadas y las contribuciones voluntarias son transferidos sin intermediarios a brigadas de rescate locales, líderes comunitarios y centros de acopio certificados en las regiones afectadas.
+                La totalidad de los ingresos obtenidos mediante la adquisición de las piezas seriadas de la colección (Camiseta y Short en Cartagena 2026) son transferidos sin intermediarios a brigadas locales y centros de acopio certificados en las comunidades afectadas. Los pedidos se gestionan de forma personalizada y directa a través del canal oficial de WhatsApp (+57 323 6737646).
               </p>
             </div>
 
