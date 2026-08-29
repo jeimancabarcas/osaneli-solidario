@@ -109,8 +109,8 @@ export const COLLECTION_PIECES: CollectionPiece[] = [
 ];
 
 export const IMAGES = {
-  fistLogo: 'https://poderlegislativo.camara.gov.co/wp-content/uploads/2026/08/foto-1-terremoto-en-colombia-imagen.webp',
-  fistAlt: 'https://poderlegislativo.camara.gov.co/wp-content/uploads/2026/08/foto-1-terremoto-en-colombia-imagen.webp',
+  fistLogo: 'https://www.aica.org/imagenes/noticias/colombia-caritas-pide-sostener-la-solidaridad-tras-el-terremoto1-4fU3.jpg',
+  fistAlt: 'https://www.aica.org/imagenes/noticias/colombia-caritas-pide-sostener-la-solidaridad-tras-el-terremoto1-4fU3.jpg',
   rescueWorkers: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBebnOXEigH1ETbYVSsfSiPwb7zwuK_Tckc1lozjFLhNivwZCC9C7QpKeLq9t4rpAHU2RecnZEENv2LVwZIDeJu6aFk0JdGMRoOsnG7pYV_od7BKL6e0BRGVQEdIWwYFRiAYb-Tn7YCR68aGlokmKX-QhHPcl__SFu6nL3YTsCm7eR4qv2VoddXeAnUOovTvKdttGBv9h_LEZ0fDu1SW97VfdtN3PU4kWZIoOCHm88BCiyxwFVqYV_yYCDCWUbfs6p4joI',
   damagedBuildings: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBWERsUxliQ-lMxqiF50uox2W1MygmVDX4XtH02s9LlwsMty220ZtHXClyldaA9gsUDOVNZ_ghDJBFZ4YxXEyeBn9Uq-E_LcyuLq09vBskvSO_HEiv6nxPUg-fddr2Um9i2uWSrsjn26HwpM5X4cdQvLLROiWXK9qBOjIXWsEEc1TQfrysfsicnRySOV9SQzSSG6ngFeTFW407kMMe1hUv9NrwXcW-RykIdEha95_9-GkEsXBDI4CNjqEge2UeMdILKYTw',
   iloveColombia: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAeNaLk5yejlWe7wu0w3wAPKucojLF6RlCKtJtzsVR56zABkf7cVwQ1oAF93mmVXruggIVHYxzj5cWokxfPMoBgSH8wA2Yil4uGV78ttXxQsST9K-TfUXPh9VykJ2m-QROcUxP5CLrZoy63NSmoAiyHt2Fvg31r8Z4u77v8jJwl8P3AlklWbG2uZ16_jd2ao2IDHSK6NoWVYhqBTmjCwDWhgItp9B-IMzHxozWCQHHK87tYyTgRadyWHcFAoe3FFLqxPw8',
