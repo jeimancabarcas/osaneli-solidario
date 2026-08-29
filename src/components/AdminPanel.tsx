@@ -449,14 +449,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToStore }) => {
           ) : (
             <div className="flex flex-wrap items-center gap-6 text-[13px] font-mono-tag">
               <p className="text-[#c6c6ce]">
-                Contador en la Tienda:{' '}
+                Impacto Calculado:{' '}
                 <strong className="text-[#e9c349] font-bold text-[16px]">
                   {campaignStats.currentCount}
                 </strong>{' '}
-                / {campaignStats.totalCount} piezas ({Math.round((campaignStats.currentCount / campaignStats.totalCount) * 100)}%)
+                / {campaignStats.totalCount} piezas ({campaignStats.totalCount > 0 ? Math.round((campaignStats.currentCount / campaignStats.totalCount) * 100) : 0}%)
               </p>
               <p className="text-[#c6c6ce] text-[12px]">
-                💡 Al presionar <span className="text-emerald-400 font-bold">"Confirmar Pedido"</span> o crear un pedido confirmado, el sistema incrementa automáticamente este contador y publica el donante en el feed LIVE del sitio.
+                💡 El contador se calcula en tiempo real como la sumatoria exacta de las cantidades (<span className="text-[#e9c349] font-mono">quantity</span>) de los items registrados en todos los pedidos de la base de datos.
               </p>
             </div>
           )}

@@ -23,8 +23,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onOpenImageLightbox,
 }) => {
   const isCountLoading = isLoadingCampaign || currentCount === null;
-  const safeCount = currentCount ?? 0;
-  const percentage = Math.min(100, Math.round((safeCount / totalCount) * 100));
+  const safeCount = typeof currentCount === 'number' ? Math.max(0, currentCount) : 0;
+  const safeTotal = typeof totalCount === 'number' && totalCount > 0 ? totalCount : 200;
+  const percentage = Math.min(100, Math.max(0, Math.round((safeCount / safeTotal) * 100)));
 
   return (
     <section id="hero-section" className="w-full pt-28 md:pt-36 pb-12 md:pb-20">

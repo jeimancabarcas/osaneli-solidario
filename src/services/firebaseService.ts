@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { Donor, Order, OrderStatus } from '../types';
+import { INITIAL_DONORS } from '../data/mockData';
 
 export function formatTimeAgo(timestamp: number): string {
   const now = Date.now();
@@ -281,7 +282,27 @@ export function subscribeToDonors(onUpdate: (donors: Donor[]) => void): () => vo
 
   const unsubscribe = onSnapshot(
     q,
-    (snapshot) => {
+    async (snapshot) => {
+      // If collection is empty, seed initial donors once
+      if (snapshot.empty) {
+        try {
+          for (const d of INITIAL_DONORS) {
+            await setDoc(doc(db, 'donors', d.id), {
+              name: d.name,
+              message: d.message || '',
+              itemSupported: d.itemSupported || '',
+              city: 'Cartagena',
+              timestamp: d.timestamp || Date.now(),
+              status: 'confirmed',
+            });
+          }
+        } catch (e) {
+          console.warn('Could not seed initial donors:', e);
+        }
+        onUpdate(INITIAL_DONORS);
+        return;
+      }
+
       const donors: Donor[] = snapshot.docs.map((docSnap) => {
         const data = docSnap.data();
         const timestamp = typeof data.timestamp === 'number' ? data.timestamp : Date.now();
@@ -301,6 +322,8 @@ export function subscribeToDonors(onUpdate: (donors: Donor[]) => void): () => vo
     },
     (error) => {
       handleFirestoreError(error, OperationType.LIST, 'donors');
+      // Graceful fallback to initial donors on error
+      onUpdate(INITIAL_DONORS);
     }
   );
 
@@ -309,41 +332,94 @@ export function subscribeToDonors(onUpdate: (donors: Donor[]) => void): () => vo
 
 /**
  * Subscribes to real-time Campaign stats from Firestore.
+ * Calculates currentCount dynamically as the total sum of `quantity` across all items in all orders from the `orders` collection.
  */
 export function subscribeToCampaign(
   onUpdate: (stats: { currentCount: number; totalCount: number }) => void
 ): () => void {
+  const ordersRef = collection(db, 'orders');
   const campaignDocRef = doc(db, 'campaign', 'cartagena2026');
 
-  const unsubscribe = onSnapshot(
-    campaignDocRef,
-    async (docSnap) => {
-      if (!docSnap.exists()) {
-        try {
-          await setDoc(campaignDocRef, {
-            currentCount: 0,
-            totalCount: 200,
-            updatedAt: Date.now(),
-          });
-        } catch (e) {
-          console.warn('Could not initialize campaign doc:', e);
-        }
-        onUpdate({ currentCount: 0, totalCount: 200 });
-        return;
-      }
+  let currentTotalTarget = 200;
+  let latestCalculatedCount = 0;
 
-      const data = docSnap.data();
+  // Listen to campaign target doc (for configurable totalCount e.g. 200)
+  const unsubCampaignDoc = onSnapshot(
+    campaignDocRef,
+    (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const rawTotal = data.totalCount ?? data.total ?? data.metaTotal;
+        const parsedTotal = typeof rawTotal === 'number' ? rawTotal : Number(rawTotal);
+        if (!isNaN(parsedTotal) && parsedTotal > 0) {
+          currentTotalTarget = parsedTotal;
+        }
+      }
       onUpdate({
-        currentCount: typeof data.currentCount === 'number' ? data.currentCount : 0,
-        totalCount: typeof data.totalCount === 'number' ? data.totalCount : 200,
+        currentCount: latestCalculatedCount,
+        totalCount: currentTotalTarget,
       });
     },
     (error) => {
-      handleFirestoreError(error, OperationType.GET, 'campaign/cartagena2026');
+      console.warn('Error reading campaign target doc:', error);
     }
   );
 
-  return unsubscribe;
+  // Listen to orders collection in real-time to compute sum of item quantities
+  const unsubOrders = onSnapshot(
+    ordersRef,
+    async (snapshot) => {
+      let totalSumQuantity = 0;
+
+      snapshot.docs.forEach((docSnap) => {
+        const data = docSnap.data();
+        if (Array.isArray(data.items) && data.items.length > 0) {
+          for (const item of data.items) {
+            const qty = typeof item?.quantity === 'number' ? item.quantity : Number(item?.quantity);
+            totalSumQuantity += (!isNaN(qty) && qty > 0) ? qty : 1;
+          }
+        } else if (typeof data.quantity === 'number' && data.quantity > 0) {
+          totalSumQuantity += data.quantity;
+        } else {
+          totalSumQuantity += 1;
+        }
+      });
+
+      latestCalculatedCount = totalSumQuantity;
+
+      // Sync computed count to campaign document for persistence
+      try {
+        await setDoc(
+          campaignDocRef,
+          {
+            currentCount: totalSumQuantity,
+            totalCount: currentTotalTarget,
+            updatedAt: Date.now(),
+          },
+          { merge: true }
+        );
+      } catch (e) {
+        console.warn('Could not sync computed pieces count to campaign doc:', e);
+      }
+
+      onUpdate({
+        currentCount: totalSumQuantity,
+        totalCount: currentTotalTarget,
+      });
+    },
+    (error) => {
+      handleFirestoreError(error, OperationType.LIST, 'orders');
+      onUpdate({
+        currentCount: latestCalculatedCount,
+        totalCount: currentTotalTarget,
+      });
+    }
+  );
+
+  return () => {
+    unsubCampaignDoc();
+    unsubOrders();
+  };
 }
 
 /**
