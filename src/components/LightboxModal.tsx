@@ -38,6 +38,7 @@ export const LightboxModal: React.FC<LightboxModalProps> = ({
           <img
             src={imageUrl}
             alt={title}
+            referrerPolicy="no-referrer"
             className="max-h-[80vh] w-auto max-w-full object-contain"
           />
         </div>

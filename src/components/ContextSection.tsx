@@ -76,6 +76,7 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
               <img
                 src={IMAGES.rescueWorkers}
                 alt="Cuerpos de rescate y brigadistas en zona de emergencia Cartagena"
+                referrerPolicy="no-referrer"
                 className="w-full aspect-[16/10] md:aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
@@ -98,6 +99,7 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
               <img
                 src={IMAGES.damagedBuildings}
                 alt="Infraestructura afectada y labores de remoción comunitaria"
+                referrerPolicy="no-referrer"
                 className="w-full aspect-[16/10] md:aspect-[4/3] object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
@@ -135,6 +137,7 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
               <img
                 src={IMAGES.iloveColombia}
                 alt="Gráfica I Love Colombia 10 Agosto 2026 Cartagena"
+                referrerPolicy="no-referrer"
                 className="w-full h-auto object-contain p-4 transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
@@ -157,6 +160,7 @@ export const ContextSection: React.FC<ContextSectionProps> = ({
               <img
                 src={IMAGES.collectionGrid}
                 alt="Colección solidaria: Camiseta y Short de Denim"
+                referrerPolicy="no-referrer"
                 className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
